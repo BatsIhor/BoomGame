@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Animations>
+  <!--Player animation definitions-->
+  <Definition Alias="BomberAnimation" FrameHeight="73" FrameWidth="73" SheetColumns="10" SheetName="Textures/Punch" SheetRows="4" Speed="75" />
+  
+  <Definition Alias="BombAnimation" FrameHeight="37" FrameWidth="36" SheetColumns="16" SheetName="Textures/Bomb" SheetRows="1" Speed="75" />
+</Animations>
