@@ -391,7 +391,7 @@ namespace HoneycombRush.Screens
         private void createGameComponents()
         {
             // Create all the blocks and the bees
-            createLevel();
+            blocks = XmlLogic.CreateLevel(ScreenManager, blockTexture, animations, this);
 
             // Creates the Bomberman
             bomberman = new Bomberman(ScreenManager.Game, this, new Vector2(20, 20));
@@ -403,84 +403,7 @@ namespace HoneycombRush.Screens
 
             ScreenManager.Game.Components.Add(bomberman);
         }
-
-        /// <summary>
-        /// Creates all the blocks and bees.
-        /// </summary>
-        private void createLevel()
-        {
-            // TODO read level from file.
-            List<Block> blocksList = new List<Block>()
-                {
-                    //First line
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(60, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(100, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(140, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(180, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(220, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(260, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(340, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(380, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(420, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(460, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(500, 104)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(540, 104)),
-                    
-                    //second line
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(60, 140)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(540, 140)),
-            
-                    //third line
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(60,  176)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(540, 176)),
-
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(60,  212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(100, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(140, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(180, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(220, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(260, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(300, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(340, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(380, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(420, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(460, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(500, 212)),
-                    new Block( ScreenManager.Game, this, blockTexture, new Vector2(540, 212)),
-
-                };
-
-            foreach (Block block in blocksList)
-            {
-                block.AnimationDefinitions = animations;
-                ScreenManager.Game.Components.Add(block);
-
-                Vector2 vector = new Vector2((block.BodyRectangle.X - 20) / 40, (block.BodyRectangle.Y - 40) / 36);
-
-                blocks[(int)vector.X, (int)vector.Y] = block;
-            }
-
-            Debug.WriteLine("-----------------------");
-            for (int i = 0; i < 11; i++)
-            {
-                string line = string.Empty;
-
-                for (int j = 0; j < 15; j++)
-                {
-                    if (blocks[j, i] == null)
-                    {
-                        line = line + ".";
-                    }
-                    else
-                    {
-                        line = line + "X";
-                    }
-                }
-                Debug.WriteLine(line);
-            }
-            Debug.WriteLine("-----------------------");
-        }
-
+        
         /// <summary>
         /// Loads all the necessary textures.
         /// </summary>

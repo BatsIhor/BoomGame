@@ -15,9 +15,7 @@ namespace HoneycombRush.Logic
 
         private bool isSmokeButtonClicked;
         private bool isInMotion;
-
-
-
+        
         private Bomberman bomberman;
 
         ScreenManager screenManager;
