@@ -25,12 +25,10 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace HoneycombRush.Screens
 {
-    /// <summary>
-    /// This is the class the handle the entire game
-    /// </summary>
     public class GameplayScreen : GameScreen
     {
-        #region Fields/Properties
+        #region Fields
+
         private const string SmokeText = "Smoke";
 
         private SpriteFont font16px;
@@ -49,7 +47,7 @@ namespace HoneycombRush.Screens
         private Vector2 smokeButtonPosition;
         private Vector2 lastTouchPosition;
 
-        private bool isSmokebuttonClicked;
+        private bool isSmokeButtonClicked;
         private bool drawArrow;
         private bool drawArrowInterval;
         private bool isInMotion;
@@ -72,6 +70,10 @@ namespace HoneycombRush.Screens
 
         private DifficultyMode gameDifficultyLevel;
 
+        #endregion
+
+        #region Properties
+
         public bool IsStarted
         {
             get
@@ -91,6 +93,8 @@ namespace HoneycombRush.Screens
         }
 
         #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Creates a new gameplay screen.
@@ -120,6 +124,8 @@ namespace HoneycombRush.Screens
             EnabledGestures = GestureType.Tap;
         }
 
+        #endregion
+
         #region Loading and Unloading
 
         /// <summary>
@@ -127,8 +133,7 @@ namespace HoneycombRush.Screens
         /// </summary>
         public void LoadAssets()
         {
-            animations = new Dictionary<string, Animation>();
-            loadAnimationFromXml();
+            animations = XmlLogic.LoadAnimationFromXml(ScreenManager);
 
             loadTextures();
 
@@ -193,9 +198,7 @@ namespace HoneycombRush.Screens
                 }
             }
 
-            isSmokebuttonClicked = false;
-
-            PlayerIndex player;
+            isSmokeButtonClicked = false;
 
             // If there was any touch
             if (VirtualThumbsticks.RightThumbstickCenter.HasValue)
@@ -205,16 +208,12 @@ namespace HoneycombRush.Screens
 
                 // Touch BodyRectangle
                 Rectangle touchRectangle = new Rectangle((int)VirtualThumbsticks.RightThumbstickCenter.Value.X, (int)VirtualThumbsticks.RightThumbstickCenter.Value.Y, 1, 1);
+
                 // If the touch is in the button
                 if (buttonRectangle.Contains(touchRectangle))
                 {
-                    isSmokebuttonClicked = true;
+                    isSmokeButtonClicked = true;
                 }
-            }
-
-            if (input.IsKeyDown(Keys.Space, ControllingPlayer, out player))
-            {
-                isSmokebuttonClicked = true;
             }
 
             if (input.Gestures.Count > 0)
@@ -247,7 +246,6 @@ namespace HoneycombRush.Screens
             if (checkIfCurrentGameFinished())
             {
                 base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
-
                 return;
             }
 
@@ -261,30 +259,22 @@ namespace HoneycombRush.Screens
 
             handleThumbStick();
 
-            bomberman.DrawOrder = 1;
-            int beeKeeperY = (int)(bomberman.FramePosition.Y + bomberman.BodyRectangle.Height - 2);
+            bomberman.DrawOrder = 100;
 
             // We want to determine the draw order of the beekeeper,
             // if the beekeeper is under half the height of the Block 
             // it should be drawn over the Block.
             foreach (Block block in blocks)
             {
-                if (block != null && beeKeeperY > block.BodyRectangle.Y)
+                if (block != null)
                 {
-                    if (block.BodyRectangle.Y + block.BodyRectangle.Height / 2 < beeKeeperY)
-                    {
-                        bomberman.DrawOrder = Math.Max(bomberman.DrawOrder, block.BodyRectangle.Y + 1);
-                    }
+                    bomberman.DrawOrder = Math.Max(bomberman.DrawOrder, block.BodyRectangle.Y + 1);
                 }
             }
 
             if (gameElapsed.Minutes == 0 && gameElapsed.Seconds == 10)
             {
                 AudioManager.PlaySound("10SecondCountDown");
-            }
-            if (gameElapsed.Minutes == 0 && gameElapsed.Seconds == 30)
-            {
-                AudioManager.PlaySound("30SecondWarning");
             }
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
@@ -306,14 +296,12 @@ namespace HoneycombRush.Screens
 
             if (IsActive && IsStarted)
             {
-                drawSmokeButton();
+                drawBombButton();
 
                 ScreenManager.SpriteBatch.Draw(controlstickBoundary, controlstickBoundaryPosition, Color.White);
                 ScreenManager.SpriteBatch.Draw(controlstick, controlstickStartupPosition, Color.White);
 
                 ScreenManager.SpriteBatch.DrawString(font16px, SmokeText, new Vector2(684, 456), Color.White);
-
-                drawVatHoneyArrow();
             }
 
             drawLevelEndIfNecessary();
@@ -336,14 +324,7 @@ namespace HoneycombRush.Screens
 
                 if (isUserWon)
                 {
-                    if (checkIsInHighScore())
-                    {
-                        stringToDisplay = "It's a new\nHigh-Score!";
-                    }
-                    else
-                    {
-                        stringToDisplay = "You Win!";
-                    }
+                    stringToDisplay = "You Win!";
                 }
                 else
                 {
@@ -358,16 +339,6 @@ namespace HoneycombRush.Screens
                    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2 - stringVector.X / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2 - stringVector.Y / 2),
                    Color.White);
             }
-        }
-
-        /// <summary>
-        /// Checks if the user's score is a high score.
-        /// </summary>
-        /// <returns>True if the user has a high score, false otherwise.</returns>
-        private bool checkIsInHighScore()
-        {
-            // User can be at high score only if he is at Hard level.
-            return gameDifficultyLevel == DifficultyMode.Hard && HighScoreScreen.IsInHighscores(score);
         }
 
         /// <summary>
@@ -413,64 +384,7 @@ namespace HoneycombRush.Screens
             ScreenManager.AddScreen(new BackgroundScreen("pauseBackground"), null);
             ScreenManager.AddScreen(new PauseScreen(), null);
         }
-
-        /// <summary>
-        /// Loads animation settings from an xml file.
-        /// </summary>
-        private void loadAnimationFromXml()
-        {
-            XDocument doc = XDocument.Load("Content/Textures/AnimationsDefinition.xml");
-            XName name = XName.Get("Definition");
-            if (doc.Document != null)
-            {
-                var definitions = doc.Document.Descendants(name);
-
-                // Loop over all definitions in the XML
-                foreach (var animationDefinition in definitions)
-                {
-                    // Get the name of the animation
-                    string animationAlias = animationDefinition.Attribute("Alias").Value;
-                    Texture2D texture =
-                        ScreenManager.Game.Content.Load<Texture2D>(animationDefinition.Attribute("SheetName").Value);
-
-                    // Get the frame size (width & height)
-                    Point frameSize = new Point();
-                    frameSize.X = int.Parse(animationDefinition.Attribute("FrameWidth").Value);
-                    frameSize.Y = int.Parse(animationDefinition.Attribute("FrameHeight").Value);
-
-                    // Get the frames sheet dimensions
-                    Point sheetSize = new Point();
-                    sheetSize.X = int.Parse(animationDefinition.Attribute("SheetColumns").Value);
-                    sheetSize.Y = int.Parse(animationDefinition.Attribute("SheetRows").Value);
-
-                    Animation animation = new Animation(texture, frameSize, sheetSize);
-
-                    // Checks for sub-animation definition
-                    if (animationDefinition.Element("SubDefinition") != null)
-                    {
-                        int startFrame = int.Parse(animationDefinition.Element("SubDefinition").Attribute("StartFrame").Value);
-
-                        int endFrame = int.Parse(animationDefinition.Element("SubDefinition").Attribute("EndFrame").Value);
-
-                        animation.SetSubAnimation(startFrame, endFrame);
-                    }
-
-                    if (animationDefinition.Attribute("Speed") != null)
-                    {
-                        animation.SetFrameInterval(TimeSpan.FromMilliseconds(double.Parse(animationDefinition.Attribute("Speed").Value)));
-                    }
-
-                    if (null != animationDefinition.Attribute("OffsetX") &&
-                        null != animationDefinition.Attribute("OffsetY"))
-                    {
-                        animation.Offset = new Vector2(int.Parse(animationDefinition.Attribute("OffsetX").Value), int.Parse(animationDefinition.Attribute("OffsetY").Value));
-                    }
-
-                    animations.Add(animationAlias, animation);
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Create all the game components.
         /// </summary>
@@ -495,7 +409,6 @@ namespace HoneycombRush.Screens
         /// </summary>
         private void createLevel()
         {
-
             // TODO read level from file.
             List<Block> blocksList = new List<Block>()
                 {
@@ -598,7 +511,7 @@ namespace HoneycombRush.Screens
                 controlstickBoundary.Height + 60);
 
             //handle bomb Button
-            if (isSmokebuttonClicked)
+            if (isSmokeButtonClicked)
             {
                 dropBomb();
             }
@@ -764,13 +677,6 @@ namespace HoneycombRush.Screens
                     if (isUserWon) // True - the user won
                     {
                         // If is in high score, gets is name
-                        if (checkIsInHighScore())
-                        {
-                            Guide.BeginShowKeyboardInput(PlayerIndex.One,
-                                "Player Name", "What is your name (max 15 characters)?", "Player",
-                                afterPlayerEnterName, levelEnded);
-                        }
-
                         AudioManager.PlaySound("Victory");
                     }
                     else
@@ -784,65 +690,13 @@ namespace HoneycombRush.Screens
 
             return false;
         }
-
-        /// <summary>
-        /// A handler invoked after the user has entered his name.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        private void afterPlayerEnterName(IAsyncResult result)
-        {
-            // Get the name entered by the user
-            string playerName = Guide.EndShowKeyboardInput(result);
-
-            if (!string.IsNullOrEmpty(playerName))
-            {
-                // Ensure that it is valid
-                if (playerName != null && playerName.Length > 15)
-                {
-                    playerName = playerName.Substring(0, 15);
-                }
-
-                // Puts it in high score
-                HighScoreScreen.PutHighScore(playerName, score);
-            }
-
-            // Moves to the next screen
-            moveToNextScreen((bool)result.AsyncState);
-        }
-
-        /// <summary>
-        /// Draws the arrow in intervals of 20 game update loops.        
-        /// </summary>
-        private void drawVatHoneyArrow()
-        {
-            // If the arrow needs to be drawn, and it is not invisible during the current interval
-            if (drawArrow && drawArrowInterval)
-            {
-                ScreenManager.SpriteBatch.Draw(arrowTexture, new Vector2(370, 314), Color.White);
-                if (arrowCounter == 20)
-                {
-                    drawArrowInterval = false;
-                    arrowCounter = 0;
-                }
-                arrowCounter++;
-            }
-            else
-            {
-                if (arrowCounter == 20)
-                {
-                    drawArrowInterval = true;
-                    arrowCounter = 0;
-                }
-                arrowCounter++;
-            }
-        }
-
+        
         /// <summary>
         /// Draws the smoke button.
         /// </summary>
-        private void drawSmokeButton()
+        private void drawBombButton()
         {
-            if (isSmokebuttonClicked)
+            if (isSmokeButtonClicked)
             {
                 ScreenManager.SpriteBatch.Draw(
                    smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
@@ -879,7 +733,6 @@ namespace HoneycombRush.Screens
                 }
 
                 Vector2 size = font16px.MeasureString(text);
-
 
                 Vector2 textPosition = (new Vector2(ScreenManager.GraphicsDevice.Viewport.Width,
                      ScreenManager.GraphicsDevice.Viewport.Height) - size) / 2f;

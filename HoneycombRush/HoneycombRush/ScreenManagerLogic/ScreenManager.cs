@@ -38,8 +38,7 @@ namespace HoneycombRush.ScreenManagerLogic
         #endregion
 
         #region Properties
-
-
+        
         /// <summary>
         /// A default SpriteBatch shared by all the screens. This saves
         /// each screen having to bother creating their own local instance.
@@ -48,8 +47,7 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             get { return spriteBatch; }
         }
-
-
+        
         /// <summary>
         /// A default font shared by all the screens. This saves
         /// each screen having to bother loading their own local copy.
@@ -58,14 +56,12 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             get { return font; }
         }
-
-
+        
         public Texture2D ButtonBackground 
         {
             get { return buttonBackground; }
         }
-
-
+        
         /// <summary>
         /// If true, the manager prints out a list of all the screens
         /// each time it is updated. This can be useful for making sure
@@ -80,8 +76,7 @@ namespace HoneycombRush.ScreenManagerLogic
         #endregion
 
         #region Initialization
-
-
+        
         /// <summary>
         /// Constructs a new screen manager component.
         /// </summary>
@@ -92,8 +87,7 @@ namespace HoneycombRush.ScreenManagerLogic
             // we don't assume the game wants to read them.
             TouchPanel.EnabledGestures = GestureType.None;
         }
-
-
+        
         /// <summary>
         /// Initializes the screen manager component.
         /// </summary>
@@ -103,8 +97,7 @@ namespace HoneycombRush.ScreenManagerLogic
 
             isInitialized = true;
         }
-
-
+        
         /// <summary>
         /// Load your graphics content.
         /// </summary>
@@ -112,8 +105,7 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             // Load content belonging to the screen manager.
             ContentManager content = Game.Content;
-
-
+            
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
             Game.Services.AddService(typeof(SpriteBatch), spriteBatch); 
 
@@ -127,8 +119,7 @@ namespace HoneycombRush.ScreenManagerLogic
                 screen.LoadContent();
             }
         }
-
-
+        
         /// <summary>
         /// Unload your graphics content.
         /// </summary>
@@ -140,13 +131,11 @@ namespace HoneycombRush.ScreenManagerLogic
                 screen.UnloadContent();
             }
         }
-
-
+        
         #endregion
 
         #region Update and Draw
-
-
+        
         /// <summary>
         /// Allows each screen to run logic.
         /// </summary>
@@ -160,7 +149,9 @@ namespace HoneycombRush.ScreenManagerLogic
             screensToUpdate.Clear();
 
             foreach (GameScreen screen in screens)
+            {
                 screensToUpdate.Add(screen);
+            }
 
             bool otherScreenHasFocus = !Game.IsActive;
             bool coveredByOtherScreen = false;
@@ -191,16 +182,19 @@ namespace HoneycombRush.ScreenManagerLogic
                     // If this is an active non-popup, inform any subsequent
                     // screens that they are covered by it.
                     if (!screen.IsPopup)
+                    {
                         coveredByOtherScreen = true;
+                    }
                 }
             }
 
             // Print debug trace?
             if (traceEnabled)
+            {
                 TraceScreens();
+            }
         }
-
-
+        
         /// <summary>
         /// Prints a list of all the screens, for debugging.
         /// </summary>
@@ -209,12 +203,12 @@ namespace HoneycombRush.ScreenManagerLogic
             List<string> screenNames = new List<string>();
 
             foreach (GameScreen screen in screens)
+            {
                 screenNames.Add(screen.GetType().Name);
-
+            }
             Debug.WriteLine(string.Join(", ", screenNames.ToArray()));
         }
-
-
+        
         /// <summary>
         /// Tells each screen to draw itself.
         /// </summary>
@@ -222,19 +216,17 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             foreach (GameScreen screen in screens)
             {
-                if (screen.ScreenState == ScreenState.Hidden)
-                    continue;
-
-                screen.Draw(gameTime);
+                if (screen.ScreenState != ScreenState.Hidden)
+                {
+                    screen.Draw(gameTime);
+                }
             }
         }
-
-
+        
         #endregion
 
         #region Public Methods
-
-
+        
         /// <summary>
         /// Adds a new screen to the screen manager.
         /// </summary>
@@ -255,8 +247,7 @@ namespace HoneycombRush.ScreenManagerLogic
             // update the TouchPanel to respond to gestures this screen is interested in
             TouchPanel.EnabledGestures = screen.EnabledGestures;
         }
-
-
+        
         /// <summary>
         /// Removes a screen from the screen manager. You should normally
         /// use GameScreen.ExitScreen instead of calling this directly, so
@@ -281,8 +272,7 @@ namespace HoneycombRush.ScreenManagerLogic
                 TouchPanel.EnabledGestures = screens[screens.Count - 1].EnabledGestures;
             }
         }
-
-
+        
         /// <summary>
         /// Expose an array holding all the screens. We return a copy rather
         /// than the real master list, because screens should only ever be added
@@ -292,8 +282,7 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             return screens.ToArray();
         }
-
-
+        
         /// <summary>
         /// Helper draws a translucent black fullscreen sprite, used for fading
         /// screens in and out, and for darkening the background behind popups.

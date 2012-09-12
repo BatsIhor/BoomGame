@@ -105,9 +105,11 @@
     <Compile Include="Logic\ExtensionMethods.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Logic\ThumbStickLogic.cs" />
     <Compile Include="Logic\VirtualThumbsticks.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Logic\XmlLogic.cs" />
     <Compile Include="Objects\Block.cs" />
     <Compile Include="Objects\Bomb.cs" />
     <Compile Include="Objects\BombBase.cs" />
