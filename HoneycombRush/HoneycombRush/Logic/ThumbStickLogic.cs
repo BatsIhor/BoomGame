@@ -6,24 +6,25 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using HoneycombRush.Objects;
 using HoneycombRush.ScreenManagerLogic;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace HoneycombRush.Logic
 {
     class ThumbStickLogic
     {
-        private Vector2 lastTouchPosition;
-
         private bool isSmokeButtonClicked;
-        private bool isInMotion;
-        
-        private Bomberman bomberman;
 
         ScreenManager screenManager;
 
-        private Dictionary<string, Animation> animations;
+        private Texture2D smokeButton;
 
-        //private Block[,] blocks = new Block[15, 11];
+        private Vector2 smokeButtonPosition = new Vector2(664, 346);
 
+        Block[,] blocks;
+        
+        // OK
+        Vector2 lastTouchPosition;
+        
         public ThumbStickLogic(ScreenManager screenManager)
         {
             this.screenManager = screenManager;
@@ -32,8 +33,43 @@ namespace HoneycombRush.Logic
         /// <summary>
         /// Handle thumbstick logic
         /// </summary>
-        private void handleThumbStick(Vector2 controlstickBoundaryPosition, Vector2 controlstickStartupPosition, Texture2D controlstickBoundary, Texture2D controlstick)
+        public void handleThumbStick(
+            Vector2 controlstickBoundaryPosition,
+            Vector2 controlstickStartupPosition,
+            Texture2D controlstickBoundary,
+            Texture2D controlstick,
+            Block[,] blocks,
+            Bomberman bomberman,
+            InputState input)
         {
+            this.blocks = blocks;
+
+            isSmokeButtonClicked = false;
+
+            // If there was any touch
+            if (VirtualThumbsticks.RightThumbstickCenter.HasValue)
+            {
+                // Button BodyRectangle
+                Rectangle buttonRectangle = new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 60, 109);
+
+                // Touch BodyRectangle
+                Rectangle touchRectangle = new Rectangle((int)VirtualThumbsticks.RightThumbstickCenter.Value.X, (int)VirtualThumbsticks.RightThumbstickCenter.Value.Y, 1, 1);
+
+                // If the touch is in the button
+                if (buttonRectangle.Contains(touchRectangle))
+                {
+                    isSmokeButtonClicked = true;
+                }
+            }
+
+            if (input.TouchState.Count > 0)
+            {
+                foreach (TouchLocation touch in input.TouchState)
+                {
+                    lastTouchPosition = touch.Position;
+                }
+            }
+
             // Calculate the rectangle of the outer circle of the thumbstick
             Rectangle outerControlstick = new Rectangle(
                 0,
@@ -44,13 +80,12 @@ namespace HoneycombRush.Logic
             //handle bomb Button
             if (isSmokeButtonClicked)
             {
-                dropBomb();
+                dropBomb(bomberman);
             }
 
             // Reset the thumbstick position when it is idle
             if (VirtualThumbsticks.LeftThumbstick == Vector2.Zero)
             {
-                isInMotion = false;
                 bomberman.SetMovement(Vector2.Zero);
                 controlstickStartupPosition = new Vector2(55, 369);
             }
@@ -62,12 +97,11 @@ namespace HoneycombRush.Logic
                 if (!outerControlstick.Contains(touchRectangle))
                 {
                     controlstickStartupPosition = new Vector2(55, 369);
-                    isInMotion = false;
                     return;
                 }
 
                 // Move the beekeeper
-                setMotion();
+                setMotion(bomberman);
 
                 // Moves the thumbstick's inner circle
                 float radious = controlstick.Width / 2 + 35;
@@ -78,13 +112,13 @@ namespace HoneycombRush.Logic
         /// <summary>
         /// Drops the bomb.
         /// </summary>
-        private void dropBomb()
+        private void dropBomb(Bomberman bomberman)
         {
             if (bomberman.Bombs.Count > 0)
             {
                 Bomb bomb = bomberman.Bombs.First();
                 bomb.SetPosition(new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y - 10));
-                bomb.AnimationDefinitions = animations;
+                bomb.AnimationDefinitions = XmlLogic.LoadAnimationFromXml(screenManager);
                 if (!screenManager.Game.Components.Contains(bomb))
                 {
                     screenManager.Game.Components.Add(bomb);
@@ -96,7 +130,7 @@ namespace HoneycombRush.Logic
         /// <summary>
         /// Moves the beekeeper.
         /// </summary>
-        private void setMotion()
+        private void setMotion(Bomberman bomberman)
         {
             Vector2 leftThumbstick = VirtualThumbsticks.LeftThumbstick;
 
@@ -111,47 +145,40 @@ namespace HoneycombRush.Logic
                 leftThumbstick.Y = 0;
             }
 
-            if (leftThumbstick == Vector2.Zero)
-            {
-                isInMotion = false;
-            }
-            else
+            if (leftThumbstick != Vector2.Zero)
             {
                 if (bomberman.GetDirection == Bomberman.WalkingDirection.Down || bomberman.GetDirection == Bomberman.WalkingDirection.Up)
                 {
-                    if (checkBlockCollision(bomberCalculatedPosition))
+                    if (checkBlockCollision(bomberCalculatedPosition, bomberman))
                     {
                         leftThumbstick.Y = 0;
                         bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
 
-                        if (!checkBlockCollision(bomberCalculatedPosition))
+                        if (!checkBlockCollision(bomberCalculatedPosition, bomberman))
                         {
                             bomberman.SetMovement(leftThumbstick * 12f);
-                            isInMotion = true;
                         }
                     }
                 }
                 else
                 {
-                    if (checkBlockCollision(bomberCalculatedPosition))
+                    if (checkBlockCollision(bomberCalculatedPosition, bomberman))
                     {
                         leftThumbstick.X = 0;
                         bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
 
-                        if (!checkBlockCollision(bomberCalculatedPosition))
+                        if (!checkBlockCollision(bomberCalculatedPosition, bomberman))
                         {
                             bomberman.SetMovement(leftThumbstick * 12f);
-                            isInMotion = true;
                         }
                     }
                 }
 
                 bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
 
-                if (!checkBlockCollision(bomberCalculatedPosition))
+                if (!checkBlockCollision(bomberCalculatedPosition, bomberman))
                 {
                     bomberman.SetMovement(leftThumbstick * 12f);
-                    isInMotion = true;
                 }
             }
         }
@@ -161,7 +188,7 @@ namespace HoneycombRush.Logic
         /// </summary>
         /// <param name="bomberCalculatedPosition">The beekeeper's position.</param>
         /// <returns>True if the beekeeper collides with a Block and false otherwise.</returns>
-        private bool checkBlockCollision(Vector2 bomberCalculatedPosition)
+        private bool checkBlockCollision(Vector2 bomberCalculatedPosition, Bomberman bomberman)
         {
             // We do not use the beekeeper's collision area property as he has not actually moved at this point and
             // is still in his previous position
@@ -171,15 +198,34 @@ namespace HoneycombRush.Logic
                 bomberman.CollisionArea.Width,
                 bomberman.CollisionArea.Height);
 
-            //foreach (Block block in blocks)
-            //{
-            //    if (block != null && bomberTempCollisionArea.Intersects(block.CollisionArea))
-            //    {
-            //        // TODO move bomber out of collision area.
-            //        return true;
-            //    }
-            //}
+            foreach (Block block in blocks)
+            {
+                if (block != null && bomberTempCollisionArea.Intersects(block.CollisionArea))
+                {
+                    // TODO move bomber out of collision area.
+                    return true;
+                }
+            }
             return false;
+        }
+
+        /// <summary>
+        /// Draws the smoke button.
+        /// </summary>
+        public void drawBombButton(ScreenManager screenManager, Texture2D smokeButton)
+        {
+            if (isSmokeButtonClicked)
+            {
+                screenManager.SpriteBatch.Draw(
+                   smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
+                   new Rectangle(109, 0, 109, 109), Color.White);
+            }
+            else
+            {
+                screenManager.SpriteBatch.Draw(
+                smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
+                new Rectangle(0, 0, 109, 109), Color.White);
+            }
         }
     }
 }

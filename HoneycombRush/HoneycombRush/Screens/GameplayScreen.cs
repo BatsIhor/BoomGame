@@ -48,9 +48,6 @@ namespace HoneycombRush.Screens
         private Vector2 lastTouchPosition;
 
         private bool isSmokeButtonClicked;
-        private bool drawArrow;
-        private bool drawArrowInterval;
-        private bool isInMotion;
         private bool isAtStartupCountDown;
         private bool isLevelEnd;
         private bool levelEnded;
@@ -58,9 +55,7 @@ namespace HoneycombRush.Screens
         private bool userTapToExit;
 
         private Dictionary<string, Animation> animations;
-
-        private int arrowCounter;
-
+        
         private Block[,] blocks = new Block[15, 11];
 
         private TimeSpan gameElapsed;
@@ -69,6 +64,8 @@ namespace HoneycombRush.Screens
         private Bomberman bomberman;
 
         private DifficultyMode gameDifficultyLevel;
+
+        ThumbStickLogic thumbStickLogic;
 
         #endregion
 
@@ -105,7 +102,7 @@ namespace HoneycombRush.Screens
             TransitionOnTime = TimeSpan.FromSeconds(0.0);
             TransitionOffTime = TimeSpan.FromSeconds(0.0);
             startScreenTime = TimeSpan.FromSeconds(3);
-
+            
             //Loads configuration
             ConfigurationManager.LoadConfiguration(XDocument.Load("Content/Configuration/Configuration.xml"));
             ConfigurationManager.DifficultyMode = gameDifficultyMode;
@@ -117,7 +114,6 @@ namespace HoneycombRush.Screens
             smokeButtonPosition = new Vector2(664, 346);
             controlstickStartupPosition = new Vector2(55, 369);
 
-            isInMotion = false;
             isAtStartupCountDown = true;
             isLevelEnd = false;
 
@@ -133,6 +129,7 @@ namespace HoneycombRush.Screens
         /// </summary>
         public void LoadAssets()
         {
+            thumbStickLogic = new ThumbStickLogic(ScreenManager);
             animations = XmlLogic.LoadAnimationFromXml(ScreenManager);
 
             loadTextures();
@@ -164,6 +161,8 @@ namespace HoneycombRush.Screens
 
         #endregion
 
+        InputState input;
+
         /// <summary>
         /// Handle the player's input.
         /// </summary>
@@ -182,6 +181,7 @@ namespace HoneycombRush.Screens
                     throw new ArgumentNullException("input");
                 }
 
+                this.input = input;
                 VirtualThumbsticks.Update(input);
 
                 if (input.IsPauseGame(null))
@@ -189,30 +189,11 @@ namespace HoneycombRush.Screens
                     pauseCurrentGame();
                 }
             }
-
             if (input.TouchState.Count > 0)
             {
                 foreach (TouchLocation touch in input.TouchState)
                 {
                     lastTouchPosition = touch.Position;
-                }
-            }
-
-            isSmokeButtonClicked = false;
-
-            // If there was any touch
-            if (VirtualThumbsticks.RightThumbstickCenter.HasValue)
-            {
-                // Button BodyRectangle
-                Rectangle buttonRectangle = new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, smokeButton.Width / 2, smokeButton.Height);
-
-                // Touch BodyRectangle
-                Rectangle touchRectangle = new Rectangle((int)VirtualThumbsticks.RightThumbstickCenter.Value.X, (int)VirtualThumbsticks.RightThumbstickCenter.Value.Y, 1, 1);
-
-                // If the touch is in the button
-                if (buttonRectangle.Contains(touchRectangle))
-                {
-                    isSmokeButtonClicked = true;
                 }
             }
 
@@ -257,7 +238,9 @@ namespace HoneycombRush.Screens
 
             gameElapsed -= gameTime.ElapsedGameTime;
 
-            handleThumbStick();
+            //handleThumbStick();
+
+            thumbStickLogic.handleThumbStick(controlstickBoundaryPosition, controlstickStartupPosition, controlstickBoundary, controlstick, blocks, bomberman, input);
 
             bomberman.DrawOrder = 100;
 
@@ -296,7 +279,7 @@ namespace HoneycombRush.Screens
 
             if (IsActive && IsStarted)
             {
-                drawBombButton();
+                thumbStickLogic.drawBombButton(ScreenManager, smokeButton);
 
                 ScreenManager.SpriteBatch.Draw(controlstickBoundary, controlstickBoundaryPosition, Color.White);
                 ScreenManager.SpriteBatch.Draw(controlstick, controlstickStartupPosition, Color.White);
@@ -422,159 +405,6 @@ namespace HoneycombRush.Screens
         }
 
         /// <summary>
-        /// Handle thumbstick logic
-        /// </summary>
-        private void handleThumbStick()
-        {
-            // Calculate the rectangle of the outer circle of the thumbstick
-            Rectangle outerControlstick = new Rectangle(
-                0,
-                (int)controlstickBoundaryPosition.Y - 35,
-                controlstickBoundary.Width + 60,
-                controlstickBoundary.Height + 60);
-
-            //handle bomb Button
-            if (isSmokeButtonClicked)
-            {
-                dropBomb();
-            }
-
-            // Reset the thumbstick position when it is idle
-            if (VirtualThumbsticks.LeftThumbstick == Vector2.Zero)
-            {
-                isInMotion = false;
-                bomberman.SetMovement(Vector2.Zero);
-                controlstickStartupPosition = new Vector2(55, 369);
-            }
-            else
-            {
-                // If not in motion and the touch point is not in the control bounds - there is no movement
-                Rectangle touchRectangle = new Rectangle((int)lastTouchPosition.X, (int)lastTouchPosition.Y, 1, 1);
-
-                if (!outerControlstick.Contains(touchRectangle))
-                {
-                    controlstickStartupPosition = new Vector2(55, 369);
-                    isInMotion = false;
-                    return;
-                }
-
-                // Move the beekeeper
-                setMotion();
-
-                // Moves the thumbstick's inner circle
-                float radious = controlstick.Width / 2 + 35;
-                controlstickStartupPosition = new Vector2(55, 369) + (VirtualThumbsticks.LeftThumbstick * radious);
-            }
-        }
-
-        /// <summary>
-        /// Drops the bomb.
-        /// </summary>
-        private void dropBomb()
-        {
-            if (bomberman.Bombs.Count > 0)
-            {
-                Bomb bomb = bomberman.Bombs.First();
-                bomb.SetPosition(new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y - 10));
-                bomb.AnimationDefinitions = animations;
-                if (!ScreenManager.Game.Components.Contains(bomb))
-                {
-                    ScreenManager.Game.Components.Add(bomb);
-                    bomberman.Bombs.Remove(bomb);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Moves the beekeeper.
-        /// </summary>
-        private void setMotion()
-        {
-            Vector2 leftThumbstick = VirtualThumbsticks.LeftThumbstick;
-
-            Vector2 bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12f;
-
-            if (bomberCalculatedPosition.X < 20 || bomberCalculatedPosition.X + bomberman.CollisionArea.Width > ScreenManager.GraphicsDevice.Viewport.Width)
-            {
-                leftThumbstick.X = 0;
-            }
-            if (bomberCalculatedPosition.Y < 20 || bomberCalculatedPosition.Y + bomberman.CollisionArea.Height > ScreenManager.GraphicsDevice.Viewport.Height)
-            {
-                leftThumbstick.Y = 0;
-            }
-
-            if (leftThumbstick == Vector2.Zero)
-            {
-                isInMotion = false;
-            }
-            else
-            {
-                if (bomberman.GetDirection == Bomberman.WalkingDirection.Down || bomberman.GetDirection == Bomberman.WalkingDirection.Up)
-                {
-                    if (checkBlockCollision(bomberCalculatedPosition))
-                    {
-                        leftThumbstick.Y = 0;
-                        bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
-
-                        if (!checkBlockCollision(bomberCalculatedPosition))
-                        {
-                            bomberman.SetMovement(leftThumbstick * 12f);
-                            isInMotion = true;
-                        }
-                    }
-                }
-                else
-                {
-                    if (checkBlockCollision(bomberCalculatedPosition))
-                    {
-                        leftThumbstick.X = 0;
-                        bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
-
-                        if (!checkBlockCollision(bomberCalculatedPosition))
-                        {
-                            bomberman.SetMovement(leftThumbstick * 12f);
-                            isInMotion = true;
-                        }
-                    }
-                }
-
-                bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
-
-                if (!checkBlockCollision(bomberCalculatedPosition))
-                {
-                    bomberman.SetMovement(leftThumbstick * 12f);
-                    isInMotion = true;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Checks if the beekeeper collides with a Block.
-        /// </summary>
-        /// <param name="bomberCalculatedPosition">The beekeeper's position.</param>
-        /// <returns>True if the beekeeper collides with a Block and false otherwise.</returns>
-        private bool checkBlockCollision(Vector2 bomberCalculatedPosition)
-        {
-            // We do not use the beekeeper's collision area property as he has not actually moved at this point and
-            // is still in his previous position
-            Rectangle bomberTempCollisionArea = new Rectangle(
-                (int)bomberCalculatedPosition.X,
-                (int)bomberCalculatedPosition.Y,
-                bomberman.CollisionArea.Width,
-                bomberman.CollisionArea.Height);
-
-            foreach (Block block in blocks)
-            {
-                if (block != null && bomberTempCollisionArea.Intersects(block.CollisionArea))
-                {
-                    // TODO move bomber out of collision area.
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Checks whether the current game is over, and if so performs the necessary actions.
         /// </summary>
         /// <returns>True if the current game is over and false otherwise.</returns>
@@ -614,24 +444,24 @@ namespace HoneycombRush.Screens
             return false;
         }
         
-        /// <summary>
-        /// Draws the smoke button.
-        /// </summary>
-        private void drawBombButton()
-        {
-            if (isSmokeButtonClicked)
-            {
-                ScreenManager.SpriteBatch.Draw(
-                   smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-                   new Rectangle(109, 0, 109, 109), Color.White);
-            }
-            else
-            {
-                ScreenManager.SpriteBatch.Draw(
-                smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-                new Rectangle(0, 0, 109, 109), Color.White);
-            }
-        }
+        ///// <summary>
+        ///// Draws the smoke button.
+        ///// </summary>
+        //private void drawBombButton()
+        //{
+        //    if (isSmokeButtonClicked)
+        //    {
+        //        ScreenManager.SpriteBatch.Draw(
+        //           smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
+        //           new Rectangle(109, 0, 109, 109), Color.White);
+        //    }
+        //    else
+        //    {
+        //        ScreenManager.SpriteBatch.Draw(
+        //        smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
+        //        new Rectangle(0, 0, 109, 109), Color.White);
+        //    }
+        //}
 
         /// <summary>
         /// Draws the count down string.

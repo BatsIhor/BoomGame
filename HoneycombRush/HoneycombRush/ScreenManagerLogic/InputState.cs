@@ -6,16 +6,11 @@
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
 #endregion
-
-#region Using Statements
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
 using System.Collections.Generic;
-
-#endregion
 
 namespace HoneycombRush.ScreenManagerLogic
 {
