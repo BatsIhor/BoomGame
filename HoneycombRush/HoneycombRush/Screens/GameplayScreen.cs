@@ -36,14 +36,10 @@ namespace HoneycombRush.Screens
 
         private Texture2D arrowTexture;
         private Texture2D background;
-        private Texture2D controlstickBoundary;
-        private Texture2D controlstick;
         private Texture2D blockTexture;
-        private Texture2D smokeButton;
+        
         private Texture2D colisionArea;
 
-        private Vector2 controlstickStartupPosition;
-        private Vector2 controlstickBoundaryPosition;
         private Vector2 smokeButtonPosition;
         private Vector2 lastTouchPosition;
 
@@ -54,17 +50,12 @@ namespace HoneycombRush.Screens
         private bool userTapToExit;
 
         private Dictionary<string, Animation> animations;
-        
         private Block[,] blocks = new Block[15, 11];
-
         private TimeSpan gameElapsed;
         private TimeSpan startScreenTime;
-
         private Bomberman bomberman;
-
         private DifficultyMode gameDifficultyLevel;
-
-        ThumbStickLogic thumbStickLogic;
+        private ThumbStickLogic thumbStickLogic;
 
         #endregion
 
@@ -101,7 +92,7 @@ namespace HoneycombRush.Screens
             TransitionOnTime = TimeSpan.FromSeconds(0.0);
             TransitionOffTime = TimeSpan.FromSeconds(0.0);
             startScreenTime = TimeSpan.FromSeconds(3);
-            
+
             //Loads configuration
             ConfigurationManager.LoadConfiguration(XDocument.Load("Content/Configuration/Configuration.xml"));
             ConfigurationManager.DifficultyMode = gameDifficultyMode;
@@ -109,9 +100,7 @@ namespace HoneycombRush.Screens
             gameDifficultyLevel = gameDifficultyMode;
             gameElapsed = ConfigurationManager.ModesConfiguration[gameDifficultyLevel].GameElapsed;
 
-            controlstickBoundaryPosition = new Vector2(34, 347);
             smokeButtonPosition = new Vector2(664, 346);
-            controlstickStartupPosition = new Vector2(55, 369);
 
             isAtStartupCountDown = true;
             isLevelEnd = false;
@@ -237,7 +226,7 @@ namespace HoneycombRush.Screens
 
             gameElapsed -= gameTime.ElapsedGameTime;
 
-            thumbStickLogic.handleThumbStick(controlstickBoundaryPosition, ref controlstickStartupPosition, controlstickBoundary, controlstick, blocks, bomberman, input);
+            thumbStickLogic.HandleThumbStick(blocks, bomberman, input);
 
             bomberman.DrawOrder = 100;
 
@@ -276,10 +265,7 @@ namespace HoneycombRush.Screens
 
             if (IsActive && IsStarted)
             {
-                thumbStickLogic.drawBombButton(ScreenManager, smokeButton);
-
-                ScreenManager.SpriteBatch.Draw(controlstickBoundary, controlstickBoundaryPosition, Color.White);
-                ScreenManager.SpriteBatch.Draw(controlstick, controlstickStartupPosition, Color.White);
+                thumbStickLogic.Draw(ScreenManager);
 
                 ScreenManager.SpriteBatch.DrawString(font16px, SmokeText, new Vector2(684, 456), Color.White);
             }
@@ -364,7 +350,7 @@ namespace HoneycombRush.Screens
             ScreenManager.AddScreen(new BackgroundScreen("pauseBackground"), null);
             ScreenManager.AddScreen(new PauseScreen(), null);
         }
-        
+
         /// <summary>
         /// Create all the game components.
         /// </summary>
@@ -378,22 +364,21 @@ namespace HoneycombRush.Screens
             bomberman.Bombs = new List<Bomb> { new Bomb(ScreenManager.Game, this, Vector2.Zero) };
             bomberman.AnimationDefinitions = animations;
             bomberman.ColisionAreaRect = colisionArea;
-            bomberman.ThumbStickArea =
-                new Rectangle((int)controlstickBoundaryPosition.X, (int)controlstickBoundaryPosition.Y, controlstickBoundary.Width, controlstickBoundary.Height);
+            bomberman.ThumbStickArea = thumbStickLogic.GetThumbStickArea();
+
 
             ScreenManager.Game.Components.Add(bomberman);
         }
-        
+
         /// <summary>
         /// Loads all the necessary textures.
         /// </summary>
         private void loadTextures()
         {
+            thumbStickLogic.LoadTextures(ScreenManager);
+
             blockTexture = ScreenManager.Game.Content.Load<Texture2D>("Textures/Block");
-            background = ScreenManager.Game.Content.Load<Texture2D>("Textures/Backgrounds/Back");
-            controlstickBoundary = ScreenManager.Game.Content.Load<Texture2D>("Textures/controlstickBoundary");
-            controlstick = ScreenManager.Game.Content.Load<Texture2D>("Textures/controlstick");
-            smokeButton = ScreenManager.Game.Content.Load<Texture2D>("Textures/smokeBtn");
+            background = ScreenManager.Game.Content.Load<Texture2D>("Textures/Backgrounds/Back");            
             font16px = ScreenManager.Game.Content.Load<SpriteFont>("Fonts/GameScreenFont16px");
             arrowTexture = ScreenManager.Game.Content.Load<Texture2D>("Textures/arrow");
             font16px = ScreenManager.Game.Content.Load<SpriteFont>("Fonts/GameScreenFont16px");
@@ -408,7 +393,6 @@ namespace HoneycombRush.Screens
         private bool checkIfCurrentGameFinished()
         {
             levelEnded = false;
-            //isUserWon = vat.CurrentVatCapacity >= vat.MaxVatCapacity;
 
             // If the vat is full, the player wins
             if (isUserWon || gameElapsed <= TimeSpan.Zero)
@@ -426,7 +410,6 @@ namespace HoneycombRush.Screens
 
                     if (isUserWon) // True - the user won
                     {
-                        // If is in high score, gets is name
                         AudioManager.PlaySound("Victory");
                     }
                     else
@@ -440,25 +423,6 @@ namespace HoneycombRush.Screens
 
             return false;
         }
-        
-        ///// <summary>
-        ///// Draws the smoke button.
-        ///// </summary>
-        //private void drawBombButton()
-        //{
-        //    if (isSmokeButtonClicked)
-        //    {
-        //        ScreenManager.SpriteBatch.Draw(
-        //           smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-        //           new Rectangle(109, 0, 109, 109), Color.White);
-        //    }
-        //    else
-        //    {
-        //        ScreenManager.SpriteBatch.Draw(
-        //        smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-        //        new Rectangle(0, 0, 109, 109), Color.White);
-        //    }
-        //}
 
         /// <summary>
         /// Draws the count down string.

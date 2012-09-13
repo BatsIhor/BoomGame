@@ -14,26 +14,63 @@ namespace HoneycombRush.Logic
     {
         private bool isSmokeButtonClicked;
         private ScreenManager screenManager;
+        
         private Vector2 smokeButtonPosition = new Vector2(664, 346);
+        private Vector2 controlstickStartupPosition;
+        private Vector2 controlstickBoundaryPosition;
+        
+        private Texture2D controlstickBoundary;
+        private Texture2D controlstick;
+        private Texture2D smokeButton;
+
         Block[,] blocks;
         Vector2 lastTouchPosition;
 
         public ThumbStickLogic(ScreenManager screenManager)
         {
             this.screenManager = screenManager;
+            controlstickBoundaryPosition = new Vector2(34, 347);
+            controlstickStartupPosition = new Vector2(55, 369);
+        }
+        
+        public Rectangle GetThumbStickArea()
+        {
+            return new Rectangle((int)controlstickBoundaryPosition.X, (int)controlstickBoundaryPosition.Y, controlstickBoundary.Width, controlstickBoundary.Height);
+        }
+
+        /// <summary>
+        /// Draws the bomb button.
+        /// </summary>
+        internal void Draw(ScreenManager screenManager)
+        {
+            if (isSmokeButtonClicked)
+            {
+                screenManager.SpriteBatch.Draw(
+                   smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
+                   new Rectangle(109, 0, 109, 109), Color.White);
+            }
+            else
+            {
+                screenManager.SpriteBatch.Draw(
+                smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
+                new Rectangle(0, 0, 109, 109), Color.White);
+            }
+            
+            screenManager.SpriteBatch.Draw(controlstickBoundary, controlstickBoundaryPosition, Color.White);
+            screenManager.SpriteBatch.Draw(controlstick, controlstickStartupPosition, Color.White);
+        }
+        
+        internal void LoadTextures(ScreenManager ScreenManager)
+        {
+            controlstickBoundary = screenManager.Game.Content.Load<Texture2D>("Textures/controlstickBoundary");
+            controlstick = screenManager.Game.Content.Load<Texture2D>("Textures/controlstick");
+            smokeButton = ScreenManager.Game.Content.Load<Texture2D>("Textures/smokeBtn");
         }
 
         /// <summary>
         /// Handle thumbstick logic
         /// </summary>
-        public void handleThumbStick(
-            Vector2 controlstickBoundaryPosition,
-            ref Vector2 controlstickStartupPosition,
-            Texture2D controlstickBoundary,
-            Texture2D controlstick,
-            Block[,] blocks,
-            Bomberman bomberman,
-            InputState input)
+        public void HandleThumbStick(Block[,] blocks, Bomberman bomberman, InputState input)
         {
             this.blocks = blocks;
 
@@ -200,25 +237,6 @@ namespace HoneycombRush.Logic
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Draws the smoke button.
-        /// </summary>
-        public void drawBombButton(ScreenManager screenManager, Texture2D smokeButton)
-        {
-            if (isSmokeButtonClicked)
-            {
-                screenManager.SpriteBatch.Draw(
-                   smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-                   new Rectangle(109, 0, 109, 109), Color.White);
-            }
-            else
-            {
-                screenManager.SpriteBatch.Draw(
-                smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-                new Rectangle(0, 0, 109, 109), Color.White);
-            }
         }
     }
 }
