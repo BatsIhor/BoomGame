@@ -13,18 +13,11 @@ namespace HoneycombRush.Logic
     class ThumbStickLogic
     {
         private bool isSmokeButtonClicked;
-
-        ScreenManager screenManager;
-
-        private Texture2D smokeButton;
-
+        private ScreenManager screenManager;
         private Vector2 smokeButtonPosition = new Vector2(664, 346);
-
         Block[,] blocks;
-        
-        // OK
         Vector2 lastTouchPosition;
-        
+
         public ThumbStickLogic(ScreenManager screenManager)
         {
             this.screenManager = screenManager;
@@ -35,7 +28,7 @@ namespace HoneycombRush.Logic
         /// </summary>
         public void handleThumbStick(
             Vector2 controlstickBoundaryPosition,
-            Vector2 controlstickStartupPosition,
+            ref Vector2 controlstickStartupPosition,
             Texture2D controlstickBoundary,
             Texture2D controlstick,
             Block[,] blocks,

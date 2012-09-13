@@ -47,7 +47,6 @@ namespace HoneycombRush.Screens
         private Vector2 smokeButtonPosition;
         private Vector2 lastTouchPosition;
 
-        private bool isSmokeButtonClicked;
         private bool isAtStartupCountDown;
         private bool isLevelEnd;
         private bool levelEnded;
@@ -238,9 +237,7 @@ namespace HoneycombRush.Screens
 
             gameElapsed -= gameTime.ElapsedGameTime;
 
-            //handleThumbStick();
-
-            thumbStickLogic.handleThumbStick(controlstickBoundaryPosition, controlstickStartupPosition, controlstickBoundary, controlstick, blocks, bomberman, input);
+            thumbStickLogic.handleThumbStick(controlstickBoundaryPosition, ref controlstickStartupPosition, controlstickBoundary, controlstick, blocks, bomberman, input);
 
             bomberman.DrawOrder = 100;
 
