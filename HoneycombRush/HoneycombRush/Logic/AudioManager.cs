@@ -30,8 +30,7 @@ namespace HoneycombRush.Logic
         // Audio Data        
         Dictionary<string, SoundEffectInstance> soundBank;
         Dictionary<string, Song> musicBank;
-
-
+        
         #endregion
 
         #region Initialization
@@ -122,8 +121,7 @@ namespace HoneycombRush.Logic
         #endregion
 
         #region Sound Methods
-
-
+        
         /// <summary>
         /// Indexer. Return a sound instance by name.
         /// </summary>
@@ -173,8 +171,7 @@ namespace HoneycombRush.Logic
                 audioManager.soundBank[soundName].Play();
             }
         }
-
-
+        
         /// <summary>
         /// Plays a sound by name.
         /// </summary>

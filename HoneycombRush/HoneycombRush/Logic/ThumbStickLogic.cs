@@ -75,6 +75,15 @@ namespace HoneycombRush.Logic
             this.blocks = blocks;
 
             isSmokeButtonClicked = false;
+            IEnumerable<Bomb> bombsToBeDeleted = bomberman.Bombs.Where(bomb => bomb.IsExploded);
+            if (bombsToBeDeleted.Count() > 0)
+            {
+                foreach (Bomb bomb in bombsToBeDeleted)
+                {                    
+                    screenManager.Game.Components.Remove(bomb);
+                    bomb.Stop();
+                }
+            }
 
             // If there was any touch
             if (VirtualThumbsticks.RightThumbstickCenter.HasValue)
@@ -148,11 +157,12 @@ namespace HoneycombRush.Logic
             {
                 Bomb bomb = bomberman.Bombs.First();
                 bomb.SetPosition(new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y - 10));
+                bomb.Start();
                 bomb.AnimationDefinitions = XmlLogic.LoadAnimationFromXml(screenManager);
                 if (!screenManager.Game.Components.Contains(bomb))
                 {
                     screenManager.Game.Components.Add(bomb);
-                    bomberman.Bombs.Remove(bomb);
+                    //bomberman.Bombs.Remove(bomb);
                 }
             }
         }

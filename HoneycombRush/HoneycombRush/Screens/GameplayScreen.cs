@@ -267,7 +267,7 @@ namespace HoneycombRush.Screens
             {
                 thumbStickLogic.Draw(ScreenManager);
 
-                ScreenManager.SpriteBatch.DrawString(font16px, SmokeText, new Vector2(684, 456), Color.White);
+                //ScreenManager.SpriteBatch.DrawString(font16px, SmokeText, new Vector2(684, 456), Color.White);
             }
 
             drawLevelEndIfNecessary();
@@ -439,7 +439,7 @@ namespace HoneycombRush.Screens
                 {
                     text = "Go!";
                     isAtStartupCountDown = false;
-                    AudioManager.PlaySound("BeeBuzzing_Loop", true, .6f);
+                    //AudioManager.PlaySound("BeeBuzzing_Loop", true, .6f);
                 }
                 else
                 {

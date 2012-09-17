@@ -2,12 +2,17 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using HoneycombRush.Logic;
 
 namespace HoneycombRush.Objects
 {
     public class Bomb : TexturedDrawableGameComponent
     {
         private const string BOMB_ANIMATION = "BombAnimation";
+        private TimeSpan timer;
+        private bool isStarted;
+        private bool isExploded;
 
         private Vector2 bodySize = new Vector2(36, 37);
 
@@ -15,7 +20,7 @@ namespace HoneycombRush.Objects
             : base(game, gamePlayScreen)
         {
             this.Position = position;
-            DrawOrder = (int)position.Y;
+            DrawOrder = (int)position.Y;            
         }
 
         public override Rectangle BodyRectangle
@@ -56,6 +61,19 @@ namespace HoneycombRush.Objects
                 base.Update(gameTime);
                 return;
             }
+
+            if (isStarted)
+            {
+                timer -= gameTime.ElapsedGameTime;
+
+                if (timer.Seconds == 0)
+                {
+                    //TODO set new animation. 
+                    AudioManager.PlaySound("Explosion", false, .10f);
+                    isExploded = true;
+                }
+            }
+
             AnimationDefinitions[BOMB_ANIMATION].Update(gameTime, true);
 
             base.Update(gameTime);
@@ -83,6 +101,24 @@ namespace HoneycombRush.Objects
         public void SetPosition(Vector2 position)
         {
             this.Position = position;
+        }
+
+        internal void Start()
+        {
+            isStarted = true;
+            timer = TimeSpan.FromSeconds(3);
+        }
+
+        internal void Stop()
+        {
+            isStarted = false;
+            isExploded = false;
+
+        }
+
+        internal bool IsExploded
+        {
+            get { return isExploded; }
         }
     }
 }
