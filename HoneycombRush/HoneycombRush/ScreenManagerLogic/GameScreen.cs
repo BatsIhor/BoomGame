@@ -1,9 +1,7 @@
 using System;
-
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
-
-using System.IO;
 
 namespace HoneycombRush.ScreenManagerLogic
 {
@@ -30,6 +28,19 @@ namespace HoneycombRush.ScreenManagerLogic
     {
         #region Properties
 
+        private PlayerIndex? controllingPlayer;
+        private GestureType enabledGestures = GestureType.None;
+        private bool isExiting;
+        private bool isPopup;
+        private bool isSerializable = true;
+        private bool otherScreenHasFocus;
+        private ScreenManager screenManager;
+        private ScreenState screenState = ScreenState.TransitionOn;
+        private TimeSpan transitionOffTime = TimeSpan.Zero;
+
+
+        private TimeSpan transitionOnTime = TimeSpan.Zero;
+        private float transitionPosition = 1;
 
         /// <summary>
         /// Normally when one screen is brought up over the top of another,
@@ -44,9 +55,6 @@ namespace HoneycombRush.ScreenManagerLogic
             protected set { isPopup = value; }
         }
 
-        bool isPopup = false;
-
-
         /// <summary>
         /// Indicates how long the screen takes to
         /// transition on when it is activated.
@@ -56,8 +64,6 @@ namespace HoneycombRush.ScreenManagerLogic
             get { return transitionOnTime; }
             protected set { transitionOnTime = value; }
         }
-
-        TimeSpan transitionOnTime = TimeSpan.Zero;
 
 
         /// <summary>
@@ -70,8 +76,6 @@ namespace HoneycombRush.ScreenManagerLogic
             protected set { transitionOffTime = value; }
         }
 
-        TimeSpan transitionOffTime = TimeSpan.Zero;
-
 
         /// <summary>
         /// Gets the current position of the screen transition, ranging
@@ -83,8 +87,6 @@ namespace HoneycombRush.ScreenManagerLogic
             get { return transitionPosition; }
             protected set { transitionPosition = value; }
         }
-
-        float transitionPosition = 1;
 
 
         /// <summary>
@@ -107,8 +109,6 @@ namespace HoneycombRush.ScreenManagerLogic
             protected set { screenState = value; }
         }
 
-        ScreenState screenState = ScreenState.TransitionOn;
-
 
         /// <summary>
         /// There are two possible reasons why a screen might be transitioning
@@ -124,21 +124,14 @@ namespace HoneycombRush.ScreenManagerLogic
             protected internal set { isExiting = value; }
         }
 
-        bool isExiting = false;
-
 
         /// <summary>
         /// Checks whether this screen is active and can respond to user input.
         /// </summary>
         public bool IsActive
         {
-            get
-            {
-                return !otherScreenHasFocus &&  (screenState == ScreenState.Active);
-            }
+            get { return !otherScreenHasFocus && (screenState == ScreenState.Active); }
         }
-
-        bool otherScreenHasFocus;
 
 
         /// <summary>
@@ -149,8 +142,6 @@ namespace HoneycombRush.ScreenManagerLogic
             get { return screenManager; }
             internal set { screenManager = value; }
         }
-
-        ScreenManager screenManager;
 
 
         /// <summary>
@@ -166,8 +157,6 @@ namespace HoneycombRush.ScreenManagerLogic
             get { return controllingPlayer; }
             internal set { controllingPlayer = value; }
         }
-
-        PlayerIndex? controllingPlayer;
 
         /// <summary>
         /// Gets the gestures the screen is interested in. Screens should be as specific
@@ -193,8 +182,6 @@ namespace HoneycombRush.ScreenManagerLogic
             }
         }
 
-        GestureType enabledGestures = GestureType.None;
-
         /// <summary>
         /// Gets whether or not this screen is serializable. If this is true,
         /// the screen will be recorded into the screen manager's state and
@@ -208,30 +195,28 @@ namespace HoneycombRush.ScreenManagerLogic
             protected set { isSerializable = value; }
         }
 
-        bool isSerializable = true;
-
-
         #endregion
 
         #region Initialization
 
-
         /// <summary>
         /// Load graphics content for the screen.
         /// </summary>
-        public virtual void LoadContent() { }
+        public virtual void LoadContent()
+        {
+        }
 
 
         /// <summary>
         /// Unload content for the screen.
         /// </summary>
-        public virtual void UnloadContent() { }
-
+        public virtual void UnloadContent()
+        {
+        }
 
         #endregion
 
         #region Update and Draw
-
 
         /// <summary>
         /// Allows the screen to run logic, such as updating the transition position.
@@ -239,7 +224,7 @@ namespace HoneycombRush.ScreenManagerLogic
         /// is active, hidden, or in the middle of a transition.
         /// </summary>
         public virtual void Update(GameTime gameTime, bool otherScreenHasFocus,
-                                                      bool coveredByOtherScreen)
+                                   bool coveredByOtherScreen)
         {
             this.otherScreenHasFocus = otherScreenHasFocus;
 
@@ -288,7 +273,7 @@ namespace HoneycombRush.ScreenManagerLogic
         /// <summary>
         /// Helper for updating the screen transition position.
         /// </summary>
-        bool UpdateTransition(GameTime gameTime, TimeSpan time, int direction)
+        private bool UpdateTransition(GameTime gameTime, TimeSpan time, int direction)
         {
             // How much should we move by?
             float transitionDelta;
@@ -296,11 +281,11 @@ namespace HoneycombRush.ScreenManagerLogic
             if (time == TimeSpan.Zero)
                 transitionDelta = 1;
             else
-                transitionDelta = (float)(gameTime.ElapsedGameTime.TotalMilliseconds /
-                                          time.TotalMilliseconds);
+                transitionDelta = (float) (gameTime.ElapsedGameTime.TotalMilliseconds/
+                                           time.TotalMilliseconds);
 
             // Update the transition position.
-            transitionPosition += transitionDelta * direction;
+            transitionPosition += transitionDelta*direction;
 
             // Did we reach the end of the transition?
             if (((direction < 0) && (transitionPosition <= 0)) ||
@@ -320,14 +305,17 @@ namespace HoneycombRush.ScreenManagerLogic
         /// is only called when the screen is active, and not when some other
         /// screen has taken the focus.
         /// </summary>
-        public virtual void HandleInput(GameTime gameTime, InputState input) { }
+        public virtual void HandleInput(GameTime gameTime, InputState input)
+        {
+        }
 
 
         /// <summary>
         /// This is called when the screen should draw itself.
         /// </summary>
-        public virtual void Draw(GameTime gameTime) { }
-
+        public virtual void Draw(GameTime gameTime)
+        {
+        }
 
         #endregion
 
@@ -336,12 +324,16 @@ namespace HoneycombRush.ScreenManagerLogic
         /// <summary>
         /// Tells the screen to serialize its state into the given stream.
         /// </summary>
-        public virtual void Serialize(Stream stream) { }
+        public virtual void Serialize(Stream stream)
+        {
+        }
 
         /// <summary>
         /// Tells the screen to deserialize its state from the given stream.
         /// </summary>
-        public virtual void Deserialize(Stream stream) { }
+        public virtual void Deserialize(Stream stream)
+        {
+        }
 
         /// <summary>
         /// Tells the screen to go away. Unlike ScreenManager.RemoveScreen, which
@@ -362,10 +354,10 @@ namespace HoneycombRush.ScreenManagerLogic
             }
         }
 
-
         #endregion
 
         #region Helper Methods
+
         /// <summary>
         /// A helper method which loads assets using the screen manager's
         /// associated game content loader.
@@ -378,6 +370,7 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             return ScreenManager.Game.Content.Load<T>(assetName);
         }
+
         #endregion
     }
 }

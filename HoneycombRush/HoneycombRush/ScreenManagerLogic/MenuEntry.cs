@@ -1,16 +1,17 @@
 #region File Description
+
 //-----------------------------------------------------------------------------
 // MenuEntry.cs
 //
 // XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
+
 #endregion
 
 #region Using Statements
 
 using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,14 +25,17 @@ namespace HoneycombRush.ScreenManagerLogic
     /// entries in different ways. This also provides an event that will be raised
     /// when the menu entry is selected.
     /// </summary>
-    class MenuEntry
+    internal class MenuEntry
     {
         #region Fields
 
+        private Texture2D buttonTexture;
+
         /// <summary>
-        /// The text rendered for this entry.
+        /// The position at which the entry is drawn. This is set by the MenuScreen
+        /// each frame in Update.
         /// </summary>
-        string text;
+        private Vector2 position;
 
         /// <summary>
         /// Tracks a fading selection effect on the entry.
@@ -39,20 +43,16 @@ namespace HoneycombRush.ScreenManagerLogic
         /// <remarks>
         /// The entries transition out of the selection effect when they are deselected.
         /// </remarks>
-        float selectionFade;
+        private float selectionFade;
 
         /// <summary>
-        /// The position at which the entry is drawn. This is set by the MenuScreen
-        /// each frame in Update.
+        /// The text rendered for this entry.
         /// </summary>
-        Vector2 position;
-
-        Texture2D buttonTexture;
+        private string text;
 
         #endregion
 
         #region Properties
-
 
         /// <summary>
         /// Gets or sets the text of this menu entry.
@@ -73,23 +73,22 @@ namespace HoneycombRush.ScreenManagerLogic
         }
 
 
-        public Rectangle Bounds 
+        public Rectangle Bounds
         {
             get
             {
-                return new Rectangle((int)position.X, (int)position.Y,
-                                    buttonTexture.Width, buttonTexture.Height);
+                return new Rectangle((int) position.X, (int) position.Y,
+                                     buttonTexture.Width, buttonTexture.Height);
             }
         }
 
         public float Scale { get; set; }
 
-        public float Rotation{ get; set; }
+        public float Rotation { get; set; }
 
         #endregion
 
         #region Events
-
 
         /// <summary>
         /// Event raised when the menu entry is selected.
@@ -106,11 +105,9 @@ namespace HoneycombRush.ScreenManagerLogic
                 Selected(this, new PlayerIndexEventArgs(playerIndex));
         }
 
-
         #endregion
 
         #region Initialization
-
 
         /// <summary>
         /// Constructs a new menu entry with the specified text.
@@ -123,11 +120,9 @@ namespace HoneycombRush.ScreenManagerLogic
             Rotation = 0f;
         }
 
-
         #endregion
 
         #region Update and Draw
-
 
         /// <summary>
         /// Updates the menu entry.
@@ -143,7 +138,7 @@ namespace HoneycombRush.ScreenManagerLogic
             // When the menu selection changes, entries gradually fade between
             // their selected and deselected appearance, rather than instantly
             // popping to the new state.
-            float fadeSpeed = (float)gameTime.ElapsedGameTime.TotalSeconds * 4;
+            float fadeSpeed = (float) gameTime.ElapsedGameTime.TotalSeconds*4;
 
             if (isSelected)
                 selectionFade = Math.Min(selectionFade + fadeSpeed, 1);
@@ -157,7 +152,6 @@ namespace HoneycombRush.ScreenManagerLogic
         /// </summary>
         public virtual void Draw(MenuScreen screen, bool isSelected, GameTime gameTime)
         {
-
             Color textColor = isSelected ? Color.White : Color.Black;
             Color tintColor = isSelected ? Color.White : Color.Gray;
 
@@ -177,10 +171,10 @@ namespace HoneycombRush.ScreenManagerLogic
             SpriteFont font = screenManager.Font;
             buttonTexture = screenManager.ButtonBackground;
 
-            spriteBatch.Draw(buttonTexture, new Vector2((int)position.X, (int)position.Y), tintColor);
+            spriteBatch.Draw(buttonTexture, new Vector2((int) position.X, (int) position.Y), tintColor);
 
             spriteBatch.DrawString(screenManager.Font, text, getTextPosition(screen),
-                textColor, Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0);
+                                   textColor, Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0);
         }
 
 
@@ -189,7 +183,7 @@ namespace HoneycombRush.ScreenManagerLogic
         /// </summary>
         public virtual int GetHeight(MenuScreen screen)
         {
-            return (int)screen.ScreenManager.Font.MeasureString(Text).Y;
+            return (int) screen.ScreenManager.Font.MeasureString(Text).Y;
         }
 
         /// <summary>
@@ -197,7 +191,7 @@ namespace HoneycombRush.ScreenManagerLogic
         /// </summary>
         public virtual int GetWidth(MenuScreen screen)
         {
-            return (int)screen.ScreenManager.Font.MeasureString(Text).X;
+            return (int) screen.ScreenManager.Font.MeasureString(Text).X;
         }
 
         private Vector2 getTextPosition(MenuScreen screen)
@@ -205,14 +199,14 @@ namespace HoneycombRush.ScreenManagerLogic
             Vector2 textPosition = Vector2.Zero;
             if (Scale == 1f)
             {
-                textPosition = new Vector2((int)position.X + buttonTexture.Width / 2 - GetWidth(screen) / 2,
-                                   (int)position.Y);
+                textPosition = new Vector2((int) position.X + buttonTexture.Width/2 - GetWidth(screen)/2,
+                                           (int) position.Y);
             }
             else
             {
                 textPosition = new Vector2(
-                    (int)position.X + (buttonTexture.Width / 2 - ((GetWidth(screen) / 2)* Scale)),
-                                 (int)position.Y + (GetHeight(screen) - GetHeight(screen) * Scale) / 2);
+                    (int) position.X + (buttonTexture.Width/2 - ((GetWidth(screen)/2)*Scale)),
+                    (int) position.Y + (GetHeight(screen) - GetHeight(screen)*Scale)/2);
             }
 
             return textPosition;

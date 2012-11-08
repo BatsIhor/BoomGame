@@ -1,26 +1,22 @@
 #region File Description
+
 //-----------------------------------------------------------------------------
 // GameplayScreen.cs
 //
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
+
 #endregion
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Xml.Linq;
-
 using HoneycombRush.Logic;
 using HoneycombRush.Objects;
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
 namespace HoneycombRush.Screens
@@ -30,32 +26,29 @@ namespace HoneycombRush.Screens
         #region Fields
 
         private const string SmokeText = "Smoke";
-
-        private SpriteFont font16px;
-        private SpriteFont font36px;
+        private Dictionary<string, Animation> animations;
 
         private Texture2D arrowTexture;
         private Texture2D background;
         private Texture2D blockTexture;
-        
-        private Texture2D colisionArea;
+        private Block[,] blocks = new Block[15,11];
+        private Bomberman bomberman;
 
-        private Vector2 smokeButtonPosition;
-        private Vector2 lastTouchPosition;
+        private Texture2D colisionArea;
+        private SpriteFont font16px;
+        private SpriteFont font36px;
+        private DifficultyMode gameDifficultyLevel;
+        private TimeSpan gameElapsed;
 
         private bool isAtStartupCountDown;
         private bool isLevelEnd;
-        private bool levelEnded;
         private bool isUserWon;
-        private bool userTapToExit;
-
-        private Dictionary<string, Animation> animations;
-        private Block[,] blocks = new Block[15, 11];
-        private TimeSpan gameElapsed;
+        private Vector2 lastTouchPosition;
+        private bool levelEnded;
+        private Vector2 smokeButtonPosition;
         private TimeSpan startScreenTime;
-        private Bomberman bomberman;
-        private DifficultyMode gameDifficultyLevel;
         private ThumbStickLogic thumbStickLogic;
+        private bool userTapToExit;
 
         #endregion
 
@@ -63,10 +56,7 @@ namespace HoneycombRush.Screens
 
         public bool IsStarted
         {
-            get
-            {
-                return !isAtStartupCountDown && !levelEnded;
-            }
+            get { return !isAtStartupCountDown && !levelEnded; }
         }
 
         private int score
@@ -75,7 +65,7 @@ namespace HoneycombRush.Screens
             {
                 int highscoreFactor = ConfigurationManager.ModesConfiguration[gameDifficultyLevel].HighScoreFactor;
 
-                return highscoreFactor * (int)gameElapsed.TotalMilliseconds;
+                return highscoreFactor*(int) gameElapsed.TotalMilliseconds;
             }
         }
 
@@ -149,7 +139,7 @@ namespace HoneycombRush.Screens
 
         #endregion
 
-        InputState input;
+        private InputState input;
 
         /// <summary>
         /// Handle the player's input.
@@ -300,10 +290,11 @@ namespace HoneycombRush.Screens
                 var stringVector = font36px.MeasureString(stringToDisplay);
 
                 ScreenManager.SpriteBatch.DrawString(
-                   font36px,
-                   stringToDisplay,
-                   new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2 - stringVector.X / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2 - stringVector.Y / 2),
-                   Color.White);
+                    font36px,
+                    stringToDisplay,
+                    new Vector2(ScreenManager.GraphicsDevice.Viewport.Width/2 - stringVector.X/2,
+                                ScreenManager.GraphicsDevice.Viewport.Height/2 - stringVector.Y/2),
+                    Color.White);
             }
         }
 
@@ -322,7 +313,8 @@ namespace HoneycombRush.Screens
                     case DifficultyMode.Easy:
                     case DifficultyMode.Medium:
                         ScreenManager.AddScreen(
-                               new LevelOverScreen("You Finished Level: " + gameDifficultyLevel.ToString(), ++gameDifficultyLevel), null);
+                            new LevelOverScreen("You Finished Level: " + gameDifficultyLevel.ToString(),
+                                                ++gameDifficultyLevel), null);
                         break;
                     case DifficultyMode.Hard:
                         ScreenManager.AddScreen(new LevelOverScreen("You Win", null), null);
@@ -361,7 +353,7 @@ namespace HoneycombRush.Screens
 
             // Creates the Bomberman
             bomberman = new Bomberman(ScreenManager.Game, this, new Vector2(20, 20));
-            bomberman.Bombs = new List<Bomb> { new Bomb(ScreenManager.Game, this, Vector2.Zero) };
+            bomberman.Bombs = new List<Bomb> {new Bomb(ScreenManager.Game, this, Vector2.Zero)};
             bomberman.AnimationDefinitions = animations;
             bomberman.ColisionAreaRect = colisionArea;
             bomberman.ThumbStickArea = thumbStickLogic.GetThumbStickArea();
@@ -378,7 +370,7 @@ namespace HoneycombRush.Screens
             thumbStickLogic.LoadTextures(ScreenManager);
 
             blockTexture = ScreenManager.Game.Content.Load<Texture2D>("Textures/Block");
-            background = ScreenManager.Game.Content.Load<Texture2D>("Textures/Backgrounds/Back");            
+            background = ScreenManager.Game.Content.Load<Texture2D>("Textures/Backgrounds/Back");
             font16px = ScreenManager.Game.Content.Load<SpriteFont>("Fonts/GameScreenFont16px");
             arrowTexture = ScreenManager.Game.Content.Load<Texture2D>("Textures/arrow");
             font16px = ScreenManager.Game.Content.Load<SpriteFont>("Fonts/GameScreenFont16px");
@@ -449,7 +441,7 @@ namespace HoneycombRush.Screens
                 Vector2 size = font16px.MeasureString(text);
 
                 Vector2 textPosition = (new Vector2(ScreenManager.GraphicsDevice.Viewport.Width,
-                     ScreenManager.GraphicsDevice.Viewport.Height) - size) / 2f;
+                                                    ScreenManager.GraphicsDevice.Viewport.Height) - size)/2f;
 
                 ScreenManager.SpriteBatch.DrawString(font36px, text, textPosition, Color.White);
             }

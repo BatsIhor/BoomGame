@@ -1,5 +1,4 @@
 using HoneycombRush.Screens;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,27 +12,21 @@ namespace HoneycombRush.Objects
         #region Fields/Properties
 
         private Vector2 bodySize = new Vector2(40, 36);
-        
+
         public override Rectangle BodyRectangle
         {
-            get
-            {
-                return new Rectangle((int)Position.X, (int)Position.Y, (int)bodySize.X, (int)bodySize.Y);
-            }
+            get { return new Rectangle((int) Position.X, (int) Position.Y, (int) bodySize.X, (int) bodySize.Y); }
         }
 
         public override Rectangle CollisionArea
         {
-            get
-            {
-                return new Rectangle((int)Position.X, (int)Position.Y, (int)bodySize.X, (int)bodySize.Y);
-            }
+            get { return new Rectangle((int) Position.X, (int) Position.Y, (int) bodySize.X, (int) bodySize.Y); }
         }
 
         #endregion
 
         #region Initialization
-        
+
         /// <summary>
         /// Creates a new Block instance.
         /// </summary>
@@ -46,14 +39,14 @@ namespace HoneycombRush.Objects
         {
             this.Texture = texture;
             this.Position = position;
-            
-            DrawOrder = (int)position.Y;
+
+            DrawOrder = (int) position.Y;
         }
 
         #endregion
 
         #region Update
-        
+
         /// <summary>
         /// Updates the Block's status.
         /// </summary>
@@ -68,11 +61,11 @@ namespace HoneycombRush.Objects
 
             base.Update(gameTime);
         }
-        
+
         #endregion
 
         #region Render
-        
+
         /// <summary>
         /// Render the Block.
         /// </summary>
@@ -85,7 +78,7 @@ namespace HoneycombRush.Objects
                 return;
             }
 
-            SpriteBatch.Begin();            
+            SpriteBatch.Begin();
             SpriteBatch.Draw(Texture, Position, Color.White);
             SpriteBatch.End();
 

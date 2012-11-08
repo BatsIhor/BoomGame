@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-
 using HoneycombRush.Logic;
 using HoneycombRush.Screens;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -33,7 +31,7 @@ namespace HoneycombRush.Objects
                 }
                 else
                 {
-                    return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+                    return new Rectangle((int) Position.X, (int) Position.Y, Texture.Width, Texture.Height);
                 }
             }
         }
@@ -43,17 +41,13 @@ namespace HoneycombRush.Objects
         /// </summary>
         public virtual Rectangle CollisionArea
         {
-            get
-            {
-                return default(Rectangle);
-            }
+            get { return default(Rectangle); }
         }
 
         public Dictionary<string, Animation> AnimationDefinitions { get; set; }
 
-
         #endregion
-        
+
         /// <summary>
         /// Creates a new instance.
         /// </summary>
@@ -64,7 +58,7 @@ namespace HoneycombRush.Objects
         {
             this.GamePlayScreen = gamePlayScreen;
 
-            SpriteBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
+            SpriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
         }
     }
 }

@@ -1,9 +1,7 @@
 using System;
-
 using HoneycombRush.Logic;
 using HoneycombRush.ScreenManagerLogic;
 using HoneycombRush.Screens;
-
 using Microsoft.Xna.Framework;
 
 namespace HoneycombRush
@@ -16,11 +14,11 @@ namespace HoneycombRush
         private GraphicsDeviceManager graphics;
 
         private ScreenManager screenManager;
-     
+
         public BomberRush()
         {
             // Initialize sound system
-            AudioManager.Initialize(this);            
+            AudioManager.Initialize(this);
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 

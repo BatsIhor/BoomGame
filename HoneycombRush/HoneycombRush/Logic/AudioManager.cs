@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
@@ -12,31 +11,31 @@ namespace HoneycombRush.Logic
     public class AudioManager : GameComponent
     {
         #region Fields
-        
+
         /// <summary>
         /// The singleton for this type.
         /// </summary>
-        static AudioManager audioManager = null;
-        public static AudioManager Instance
-        {
-            get
-            {
-                return audioManager;
-            }
-        }
+        private static AudioManager audioManager;
 
-        static readonly string soundAssetLocation = "Sounds/";
+        private static readonly string soundAssetLocation = "Sounds/";
 
         // Audio Data        
-        Dictionary<string, SoundEffectInstance> soundBank;
-        Dictionary<string, Song> musicBank;
-        
+        private Dictionary<string, Song> musicBank;
+        private Dictionary<string, SoundEffectInstance> soundBank;
+
+        public static AudioManager Instance
+        {
+            get { return audioManager; }
+        }
+
         #endregion
 
         #region Initialization
-        
+
         private AudioManager(Game game)
-            : base(game) { }
+            : base(game)
+        {
+        }
 
         /// <summary>
         /// Initialize the static AudioManager functionality.
@@ -50,11 +49,11 @@ namespace HoneycombRush.Logic
 
             game.Components.Add(audioManager);
         }
-        
+
         #endregion
 
         #region Loading Methodes
-        
+
         /// <summary>
         /// Loads a single sound into the sound manager, giving it a specified alias.
         /// </summary>
@@ -114,14 +113,14 @@ namespace HoneycombRush.Logic
         /// </summary>
         public static void LoadMusic()
         {
-            LoadSong("InGameSong_Loop","InGameSong_Loop");
-            LoadSong("MenuMusic_Loop","MenuMusic_Loop");
+            LoadSong("InGameSong_Loop", "InGameSong_Loop");
+            LoadSong("MenuMusic_Loop", "MenuMusic_Loop");
         }
 
         #endregion
 
         #region Sound Methods
-        
+
         /// <summary>
         /// Indexer. Return a sound instance by name.
         /// </summary>
@@ -171,7 +170,7 @@ namespace HoneycombRush.Logic
                 audioManager.soundBank[soundName].Play();
             }
         }
-        
+
         /// <summary>
         /// Plays a sound by name.
         /// </summary>
@@ -278,11 +277,11 @@ namespace HoneycombRush.Logic
                 MediaPlayer.Stop();
             }
         }
-        
+
         #endregion
 
         #region Instance Disposal Methods
-        
+
         /// <summary>
         /// Clean up the component when it is disposing.
         /// </summary>
@@ -305,7 +304,7 @@ namespace HoneycombRush.Logic
                 base.Dispose(disposing);
             }
         }
-        
+
         #endregion
     }
 }

@@ -23,30 +23,23 @@ namespace HoneycombRush.Logic
 
         private static Dictionary<DifficultyMode, Configuration> modesConfiguration;
 
+        private static bool isLoaded;
+
         public static Dictionary<DifficultyMode, Configuration> ModesConfiguration
         {
-            get
-            {
-                return modesConfiguration;
-            }
+            get { return modesConfiguration; }
         }
 
-        static bool isLoaded = false;
         public static bool IsLoaded
         {
-            get
-            {
-                return isLoaded;
-            }
+            get { return isLoaded; }
         }
 
         public static DifficultyMode? DifficultyMode { get; set; }
 
-
         #endregion
 
         #region Public Static Methods
-
 
         /// <summary>
         /// Load configuration from an XML document.
@@ -57,24 +50,29 @@ namespace HoneycombRush.Logic
             modesConfiguration = new Dictionary<DifficultyMode, Configuration>();
             foreach (XElement element in doc.Element("Difficulties").Elements("Difficulty"))
             {
-                modesConfiguration.Add((DifficultyMode)Enum.Parse(typeof(DifficultyMode),
-                    element.Attribute("ID").Value, true),
-                    new Configuration()
-                    {
-                        DecreaseAmountSpeed = int.Parse(element.Element("DecreaseAmountSpeed").Value),
-                        GameElapsed = TimeSpan.Parse(element.Element("GameElapsed").Value),
-                        IncreaseAmountSpeed = int.Parse(element.Element("IncreaseAmountSpeed").Value),
-                        MaxSoldierBeeVelocity = int.Parse(element.Element("MaxSoldierBeeVelocity").Value),
-                        MaxWorkerBeeVelocity = int.Parse(element.Element("MaxWorkerBeeVelocity").Value),
-                        MinSoldierBeeVelocity = int.Parse(element.Element("MinSoldierBeeVelocity").Value),
-                        MinWorkerBeeVelocity = int.Parse(element.Element("MinWorkerBeeVelocity").Value),
-                        TotalSmokeAmount = int.Parse(element.Element("TotalSmokeAmount").Value),
-                        HighScoreFactor = int.Parse(element.Element("HighScoreFactor").Value)
-                    });
+                modesConfiguration.Add((DifficultyMode) Enum.Parse(typeof (DifficultyMode),
+                                                                   element.Attribute("ID").Value, true),
+                                       new Configuration
+                                           {
+                                               DecreaseAmountSpeed =
+                                                   int.Parse(element.Element("DecreaseAmountSpeed").Value),
+                                               GameElapsed = TimeSpan.Parse(element.Element("GameElapsed").Value),
+                                               IncreaseAmountSpeed =
+                                                   int.Parse(element.Element("IncreaseAmountSpeed").Value),
+                                               MaxSoldierBeeVelocity =
+                                                   int.Parse(element.Element("MaxSoldierBeeVelocity").Value),
+                                               MaxWorkerBeeVelocity =
+                                                   int.Parse(element.Element("MaxWorkerBeeVelocity").Value),
+                                               MinSoldierBeeVelocity =
+                                                   int.Parse(element.Element("MinSoldierBeeVelocity").Value),
+                                               MinWorkerBeeVelocity =
+                                                   int.Parse(element.Element("MinWorkerBeeVelocity").Value),
+                                               TotalSmokeAmount = int.Parse(element.Element("TotalSmokeAmount").Value),
+                                               HighScoreFactor = int.Parse(element.Element("HighScoreFactor").Value)
+                                           });
             }
             isLoaded = true;
         }
-
 
         #endregion
     }

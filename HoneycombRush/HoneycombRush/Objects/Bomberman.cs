@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-
 using HoneycombRush.Logic;
 using HoneycombRush.Screens;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -33,11 +31,11 @@ namespace HoneycombRush.Objects
 
         private const string BOMBER_ANIMATION_KEY = "BomberAnimation";
 
-        public Texture2D ColisionAreaRect { get; set; }
         private Vector2 bodySize = new Vector2(43, 63);
-        private Vector2 velocity;
         private WalkingDirection direction = WalkingDirection.Up;
         private int lastFrameCounter;
+        private Vector2 velocity;
+        public Texture2D ColisionAreaRect { get; set; }
 
         /// <summary>
         /// Represents the bounds of the component.
@@ -46,7 +44,8 @@ namespace HoneycombRush.Objects
         {
             get
             {
-                return new Rectangle((int)FramePosition.X - 5, (int)FramePosition.Y + 5, (int)bodySize.X, (int)bodySize.Y);
+                return new Rectangle((int) FramePosition.X - 5, (int) FramePosition.Y + 5, (int) bodySize.X,
+                                     (int) bodySize.Y);
             }
         }
 
@@ -57,7 +56,8 @@ namespace HoneycombRush.Objects
         {
             get
             {
-                return new Rectangle((int)FramePosition.X, (int)FramePosition.Y + 40, (int)bodySize.X - 10, (int)bodySize.Y - 40);
+                return new Rectangle((int) FramePosition.X, (int) FramePosition.Y + 40, (int) bodySize.X - 10,
+                                     (int) bodySize.Y - 40);
             }
         }
 
@@ -71,7 +71,7 @@ namespace HoneycombRush.Objects
         public bool IsInMotion { get; set; }
 
         public List<Bomb> Bombs { get; set; }
-        
+
         #endregion
 
         #region Initialization
@@ -99,6 +99,11 @@ namespace HoneycombRush.Objects
         }
 
         #endregion
+
+        public WalkingDirection GetDirection
+        {
+            get { return direction; }
+        }
 
         /// <summary>
         /// Updates the beekeeper's status.
@@ -147,7 +152,7 @@ namespace HoneycombRush.Objects
             {
                 // Update the animation
                 lastFrameCounter = 0;
-                AnimationDefinitions[BOMBER_ANIMATION_KEY].PlayFromFrameIndex(lastFrameCounter + (int)direction);
+                AnimationDefinitions[BOMBER_ANIMATION_KEY].PlayFromFrameIndex(lastFrameCounter + (int) direction);
             }
             else
             {
@@ -157,7 +162,7 @@ namespace HoneycombRush.Objects
                 if (lastFrameCounter == 10)
                 {
                     lastFrameCounter = 0;
-                    AnimationDefinitions[BOMBER_ANIMATION_KEY].PlayFromFrameIndex(lastFrameCounter + (int)direction);
+                    AnimationDefinitions[BOMBER_ANIMATION_KEY].PlayFromFrameIndex(lastFrameCounter + (int) direction);
                 }
                 else
                 {
@@ -165,7 +170,8 @@ namespace HoneycombRush.Objects
                 }
             }
 
-            AnimationDefinitions[BOMBER_ANIMATION_KEY].Draw(SpriteBatch, FramePosition, SpriteEffects.None, new Vector2(20, 5), ColisionAreaRect);
+            AnimationDefinitions[BOMBER_ANIMATION_KEY].Draw(SpriteBatch, FramePosition, SpriteEffects.None,
+                                                            new Vector2(20, 5), ColisionAreaRect);
 
             SpriteBatch.End();
 
@@ -191,15 +197,6 @@ namespace HoneycombRush.Objects
             }
         }
 
-        public WalkingDirection GetDirection
-        {
-            get
-            {
-
-                return direction;
-            }
-        }
-
         /// <summary>
         /// Returns movement information according to the current virtual thumbstick input.
         /// </summary>
@@ -213,17 +210,22 @@ namespace HoneycombRush.Objects
                 return;
             }
 
-            Rectangle touchPointRectangle = new Rectangle((int)VirtualThumbsticks.LeftThumbstickCenter.Value.X, (int)VirtualThumbsticks.LeftThumbstickCenter.Value.Y, 1, 1);
+            Rectangle touchPointRectangle = new Rectangle((int) VirtualThumbsticks.LeftThumbstickCenter.Value.X,
+                                                          (int) VirtualThumbsticks.LeftThumbstickCenter.Value.Y, 1, 1);
 
             if (ThumbStickArea.Intersects(touchPointRectangle))
             {
                 if (Math.Abs(VirtualThumbsticks.LeftThumbstick.X) > Math.Abs(VirtualThumbsticks.LeftThumbstick.Y))
                 {
-                    tempDirection = VirtualThumbsticks.LeftThumbstick.X > 0 ? WalkingDirection.Right : WalkingDirection.Left;
+                    tempDirection = VirtualThumbsticks.LeftThumbstick.X > 0
+                                        ? WalkingDirection.Right
+                                        : WalkingDirection.Left;
                 }
                 else
                 {
-                    tempDirection = VirtualThumbsticks.LeftThumbstick.Y > 0 ? WalkingDirection.Down : WalkingDirection.Up;
+                    tempDirection = VirtualThumbsticks.LeftThumbstick.Y > 0
+                                        ? WalkingDirection.Down
+                                        : WalkingDirection.Up;
                 }
             }
         }

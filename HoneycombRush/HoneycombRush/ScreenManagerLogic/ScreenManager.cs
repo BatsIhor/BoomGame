@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,24 +20,22 @@ namespace HoneycombRush.ScreenManagerLogic
     {
         #region Fields
 
-        List<GameScreen> screens = new List<GameScreen>();
-        List<GameScreen> screensToUpdate = new List<GameScreen>();
+        private Texture2D blankTexture;
+        private Texture2D buttonBackground;
+        private SpriteFont font;
+        private InputState input = new InputState();
 
-        InputState input = new InputState();
+        private bool isInitialized;
+        private List<GameScreen> screens = new List<GameScreen>();
+        private List<GameScreen> screensToUpdate = new List<GameScreen>();
+        private SpriteBatch spriteBatch;
 
-        SpriteBatch spriteBatch;
-        SpriteFont font;
-        Texture2D blankTexture;
-        Texture2D buttonBackground;
-
-        bool isInitialized;
-
-        bool traceEnabled;
+        private bool traceEnabled;
 
         #endregion
 
         #region Properties
-        
+
         /// <summary>
         /// A default SpriteBatch shared by all the screens. This saves
         /// each screen having to bother creating their own local instance.
@@ -47,7 +44,7 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             get { return spriteBatch; }
         }
-        
+
         /// <summary>
         /// A default font shared by all the screens. This saves
         /// each screen having to bother loading their own local copy.
@@ -56,12 +53,12 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             get { return font; }
         }
-        
-        public Texture2D ButtonBackground 
+
+        public Texture2D ButtonBackground
         {
             get { return buttonBackground; }
         }
-        
+
         /// <summary>
         /// If true, the manager prints out a list of all the screens
         /// each time it is updated. This can be useful for making sure
@@ -76,7 +73,7 @@ namespace HoneycombRush.ScreenManagerLogic
         #endregion
 
         #region Initialization
-        
+
         /// <summary>
         /// Constructs a new screen manager component.
         /// </summary>
@@ -87,7 +84,7 @@ namespace HoneycombRush.ScreenManagerLogic
             // we don't assume the game wants to read them.
             TouchPanel.EnabledGestures = GestureType.None;
         }
-        
+
         /// <summary>
         /// Initializes the screen manager component.
         /// </summary>
@@ -97,7 +94,7 @@ namespace HoneycombRush.ScreenManagerLogic
 
             isInitialized = true;
         }
-        
+
         /// <summary>
         /// Load your graphics content.
         /// </summary>
@@ -105,9 +102,9 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             // Load content belonging to the screen manager.
             ContentManager content = Game.Content;
-            
+
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
-            Game.Services.AddService(typeof(SpriteBatch), spriteBatch); 
+            Game.Services.AddService(typeof (SpriteBatch), spriteBatch);
 
             font = content.Load<SpriteFont>("Fonts/MenuFont");
             blankTexture = content.Load<Texture2D>("Textures/Backgrounds/blank");
@@ -119,7 +116,7 @@ namespace HoneycombRush.ScreenManagerLogic
                 screen.LoadContent();
             }
         }
-        
+
         /// <summary>
         /// Unload your graphics content.
         /// </summary>
@@ -131,11 +128,11 @@ namespace HoneycombRush.ScreenManagerLogic
                 screen.UnloadContent();
             }
         }
-        
+
         #endregion
 
         #region Update and Draw
-        
+
         /// <summary>
         /// Allows each screen to run logic.
         /// </summary>
@@ -194,11 +191,11 @@ namespace HoneycombRush.ScreenManagerLogic
                 TraceScreens();
             }
         }
-        
+
         /// <summary>
         /// Prints a list of all the screens, for debugging.
         /// </summary>
-        void TraceScreens()
+        private void TraceScreens()
         {
             List<string> screenNames = new List<string>();
 
@@ -208,7 +205,7 @@ namespace HoneycombRush.ScreenManagerLogic
             }
             Debug.WriteLine(string.Join(", ", screenNames.ToArray()));
         }
-        
+
         /// <summary>
         /// Tells each screen to draw itself.
         /// </summary>
@@ -222,11 +219,11 @@ namespace HoneycombRush.ScreenManagerLogic
                 }
             }
         }
-        
+
         #endregion
 
         #region Public Methods
-        
+
         /// <summary>
         /// Adds a new screen to the screen manager.
         /// </summary>
@@ -247,7 +244,7 @@ namespace HoneycombRush.ScreenManagerLogic
             // update the TouchPanel to respond to gestures this screen is interested in
             TouchPanel.EnabledGestures = screen.EnabledGestures;
         }
-        
+
         /// <summary>
         /// Removes a screen from the screen manager. You should normally
         /// use GameScreen.ExitScreen instead of calling this directly, so
@@ -272,7 +269,7 @@ namespace HoneycombRush.ScreenManagerLogic
                 TouchPanel.EnabledGestures = screens[screens.Count - 1].EnabledGestures;
             }
         }
-        
+
         /// <summary>
         /// Expose an array holding all the screens. We return a copy rather
         /// than the real master list, because screens should only ever be added
@@ -282,7 +279,7 @@ namespace HoneycombRush.ScreenManagerLogic
         {
             return screens.ToArray();
         }
-        
+
         /// <summary>
         /// Helper draws a translucent black fullscreen sprite, used for fading
         /// screens in and out, and for darkening the background behind popups.
@@ -295,7 +292,7 @@ namespace HoneycombRush.ScreenManagerLogic
 
             spriteBatch.Draw(blankTexture,
                              new Rectangle(0, 0, viewport.Width, viewport.Height),
-                             Color.Black * alpha);
+                             Color.Black*alpha);
 
             spriteBatch.End();
         }
@@ -314,7 +311,7 @@ namespace HoneycombRush.ScreenManagerLogic
                     DeleteState(storage);
                 }
 
-                // otherwise just create the directory
+                    // otherwise just create the directory
                 else
                 {
                     storage.CreateDirectory("ScreenManager");
@@ -399,8 +396,8 @@ namespace HoneycombRush.ScreenManagerLogic
                         for (int i = 0; i < screens.Count; i++)
                         {
                             string filename = string.Format("ScreenManager\\Screen{0}.dat", i);
-                            using (IsolatedStorageFileStream stream = 
-                                   storage.OpenFile(filename, FileMode.Open, FileAccess.Read))
+                            using (IsolatedStorageFileStream stream =
+                                storage.OpenFile(filename, FileMode.Open, FileAccess.Read))
                             {
                                 screens[i].Deserialize(stream);
                             }

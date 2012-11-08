@@ -1,21 +1,22 @@
 #region File Description
+
 //-----------------------------------------------------------------------------
 // MenuScreen.cs
 //
 // XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
+
 #endregion
 
 #region Using Statements
 
 using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 
 #endregion
 
@@ -25,21 +26,20 @@ namespace HoneycombRush.ScreenManagerLogic
     /// Base class for screens that contain a menu of options. The user can
     /// move up and down to select an entry, or cancel to back out of the screen.
     /// </summary>
-    abstract class MenuScreen : GameScreen
+    internal abstract class MenuScreen : GameScreen
     {
         #region Fields
 
         // the number of pixels to pad above and below menu entries for touch input
-        const int menuEntryPadding = 35;
+        private const int menuEntryPadding = 35;
 
-        List<MenuEntry> menuEntries = new List<MenuEntry>();
-        int selectedEntry = 0;
-        string menuTitle;
+        private List<MenuEntry> menuEntries = new List<MenuEntry>();
+        private string menuTitle;
+        private int selectedEntry = 0;
 
         #endregion
 
         #region Properties
-
 
         /// <summary>
         /// Gets the list of menu entries, so derived classes can add
@@ -50,11 +50,9 @@ namespace HoneycombRush.ScreenManagerLogic
             get { return menuEntries; }
         }
 
-
         #endregion
 
         #region Initialization
-
 
         /// <summary>
         /// Constructor.
@@ -69,7 +67,6 @@ namespace HoneycombRush.ScreenManagerLogic
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
         }
-
 
         #endregion
 
@@ -87,7 +84,7 @@ namespace HoneycombRush.ScreenManagerLogic
         /// Responds to user input, changing the selected entry and accepting
         /// or cancelling the menu.
         /// </summary>
-        public override void HandleInput(GameTime gameTime,InputState input)
+        public override void HandleInput(GameTime gameTime, InputState input)
         {
             // we cancel the current menu screen if the user presses the back button
             PlayerIndex player;
@@ -102,7 +99,7 @@ namespace HoneycombRush.ScreenManagerLogic
                 if (gesture.GestureType == GestureType.Tap)
                 {
                     // convert the position to a Point that we can test against a Rectangle
-                    Point tapLocation = new Point((int)gesture.Position.X, (int)gesture.Position.Y);
+                    Point tapLocation = new Point((int) gesture.Position.X, (int) gesture.Position.Y);
 
                     // iterate the entries to see if any were tapped
                     for (int i = 0; i < menuEntries.Count; i++)
@@ -148,11 +145,9 @@ namespace HoneycombRush.ScreenManagerLogic
             OnCancel(e.PlayerIndex);
         }
 
-
         #endregion
 
         #region Update and Draw
-
 
         /// <summary>
         /// Allows the screen the chance to position the menu entries. By default
@@ -163,31 +158,31 @@ namespace HoneycombRush.ScreenManagerLogic
             // Make the menu slide into place during transitions, using a
             // power curve to make things look more interesting (this makes
             // the movement slow down as it nears the end).
-            float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
+            float transitionOffset = (float) Math.Pow(TransitionPosition, 2);
 
             // start at Y = 475; each X value is generated per entry
-            Vector2 position = new Vector2(0f, 
-                ScreenManager.Game.Window.ClientBounds.Height /2 -
-                (menuEntries[0].GetHeight(this) +(menuEntryPadding * 2) * menuEntries.Count));
+            Vector2 position = new Vector2(0f,
+                                           ScreenManager.Game.Window.ClientBounds.Height/2 -
+                                           (menuEntries[0].GetHeight(this) + (menuEntryPadding*2)*menuEntries.Count));
 
             // update each menu entry's location in turn
             for (int i = 0; i < menuEntries.Count; i++)
             {
                 MenuEntry menuEntry = menuEntries[i];
-                
+
                 // each entry is to be centered horizontally
-                position.X = ScreenManager.GraphicsDevice.Viewport.Width / 2 - menuEntry.GetWidth(this) / 2;
+                position.X = ScreenManager.GraphicsDevice.Viewport.Width/2 - menuEntry.GetWidth(this)/2;
 
                 if (ScreenState == ScreenState.TransitionOn)
-                    position.X -= transitionOffset * 256;
+                    position.X -= transitionOffset*256;
                 else
-                    position.X += transitionOffset * 512;
+                    position.X += transitionOffset*512;
 
                 // set the entry's position
                 menuEntry.Position = position;
 
                 // move down for the next entry the size of this entry plus our padding
-                position.Y += menuEntry.GetHeight(this) + (menuEntryPadding * 2);
+                position.Y += menuEntry.GetHeight(this) + (menuEntryPadding*2);
             }
         }
 
@@ -195,7 +190,7 @@ namespace HoneycombRush.ScreenManagerLogic
         /// Updates the menu.
         /// </summary>
         public override void Update(GameTime gameTime, bool otherScreenHasFocus,
-                                                       bool coveredByOtherScreen)
+                                    bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
@@ -236,22 +231,21 @@ namespace HoneycombRush.ScreenManagerLogic
             // Make the menu slide into place during transitions, using a
             // power curve to make things look more interesting (this makes
             // the movement slow down as it nears the end).
-            float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
+            float transitionOffset = (float) Math.Pow(TransitionPosition, 2);
 
             // Draw the menu title centered on the screen
-            Vector2 titlePosition = new Vector2(graphics.Viewport.Width / 2, 375);
-            Vector2 titleOrigin = font.MeasureString(menuTitle) / 2;
-            Color titleColor = new Color(192, 192, 192) * TransitionAlpha;
+            Vector2 titlePosition = new Vector2(graphics.Viewport.Width/2, 375);
+            Vector2 titleOrigin = font.MeasureString(menuTitle)/2;
+            Color titleColor = new Color(192, 192, 192)*TransitionAlpha;
             float titleScale = 1.25f;
 
-            titlePosition.Y -= transitionOffset * 100;
+            titlePosition.Y -= transitionOffset*100;
 
             spriteBatch.DrawString(font, menuTitle, titlePosition, titleColor, 0,
                                    titleOrigin, titleScale, SpriteEffects.None, 0);
 
             spriteBatch.End();
         }
-
 
         #endregion
     }

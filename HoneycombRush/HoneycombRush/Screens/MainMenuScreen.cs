@@ -1,8 +1,6 @@
 using System;
-
 using HoneycombRush.Logic;
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 
 namespace HoneycombRush.Screens
@@ -10,7 +8,7 @@ namespace HoneycombRush.Screens
     internal class MainMenuScreen : MenuScreen
     {
         #region Initializations
-        
+
         public MainMenuScreen()
             : base(string.Empty)
         {
@@ -42,13 +40,13 @@ namespace HoneycombRush.Screens
         #endregion
 
         #region Update
-        
+
         /// <summary>
         /// Respond to "Play" Item Selection
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void StartGameMenuEntrySelected(object sender, EventArgs e)
+        private void StartGameMenuEntrySelected(object sender, EventArgs e)
         {
             foreach (GameScreen screen in ScreenManager.GetScreens())
                 screen.ExitScreen();
