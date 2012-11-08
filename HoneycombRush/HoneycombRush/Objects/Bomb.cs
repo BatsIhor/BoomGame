@@ -1,42 +1,40 @@
-﻿using HoneycombRush.Screens;
-
+﻿using System;
+using HoneycombRush.Logic;
+using HoneycombRush.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using HoneycombRush.Logic;
 
 namespace HoneycombRush.Objects
 {
     public class Bomb : TexturedDrawableGameComponent
     {
         private const string BOMB_ANIMATION = "BombAnimation";
-        private TimeSpan timer;
-        private bool isStarted;
-        private bool isExploded;
 
         private Vector2 bodySize = new Vector2(36, 37);
+        private bool isExploded;
+        private bool isStarted;
+        private TimeSpan timer;
 
         public Bomb(Game game, GameplayScreen gamePlayScreen, Vector2 position)
             : base(game, gamePlayScreen)
         {
             this.Position = position;
-            DrawOrder = (int)position.Y;            
+            DrawOrder = (int) position.Y;
         }
 
         public override Rectangle BodyRectangle
         {
-            get
-            {
-                return new Rectangle((int)Position.X, (int)Position.Y, (int)bodySize.X, (int)bodySize.Y);
-            }
+            get { return new Rectangle((int) Position.X, (int) Position.Y, (int) bodySize.X, (int) bodySize.Y); }
         }
 
         public override Rectangle CollisionArea
         {
-            get
-            {
-                return new Rectangle((int)Position.X, (int)Position.Y, (int)bodySize.X, (int)bodySize.Y);
-            }
+            get { return new Rectangle((int) Position.X, (int) Position.Y, (int) bodySize.X, (int) bodySize.Y); }
+        }
+
+        internal bool IsExploded
+        {
+            get { return isExploded; }
         }
 
         /// <summary>
@@ -113,12 +111,6 @@ namespace HoneycombRush.Objects
         {
             isStarted = false;
             isExploded = false;
-
-        }
-
-        internal bool IsExploded
-        {
-            get { return isExploded; }
         }
     }
 }

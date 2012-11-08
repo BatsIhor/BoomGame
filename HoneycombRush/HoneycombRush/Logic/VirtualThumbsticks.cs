@@ -1,5 +1,4 @@
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -17,7 +16,6 @@ namespace HoneycombRush.Logic
     public static class VirtualThumbsticks
     {
         #region Fields
-
 
         // the distance in screen pixels that represents a thumbstick value of 1f.
         private const float maxThumbstickDistance = 60f;
@@ -40,7 +38,6 @@ namespace HoneycombRush.Logic
         /// </summary>
         public static Vector2? RightThumbstickCenter { get; private set; }
 
-
         #endregion
 
         /// <summary>
@@ -58,7 +55,7 @@ namespace HoneycombRush.Logic
 
                 // calculate the scaled vector from the touch position to the center,
                 // scaled by the maximum thumbstick distance
-                Vector2 l = (leftPosition - LeftThumbstickCenter.Value) / maxThumbstickDistance;
+                Vector2 l = (leftPosition - LeftThumbstickCenter.Value)/maxThumbstickDistance;
 
                 // if the length is more than 1, normalize the vector
                 if (l.LengthSquared() > 1f)
@@ -85,7 +82,7 @@ namespace HoneycombRush.Logic
 
                 // calculate the scaled vector from the touch position to the center,
                 // scaled by the maximum thumbstick distance
-                Vector2 r = (rightPosition - RightThumbstickCenter.Value) / maxThumbstickDistance;
+                Vector2 r = (rightPosition - RightThumbstickCenter.Value)/maxThumbstickDistance;
 
                 // if the length is more than 1, normalize the vector
                 if (r.LengthSquared() > 1f)
@@ -94,7 +91,6 @@ namespace HoneycombRush.Logic
                 }
 
                 return r;
-
             }
         }
 
@@ -103,7 +99,6 @@ namespace HoneycombRush.Logic
         /// </summary>
         public static void Update(InputState input)
         {
-           
             TouchLocation? leftTouch = null, rightTouch = null;
             TouchCollection touches = input.TouchState;
 
@@ -140,7 +135,7 @@ namespace HoneycombRush.Logic
                 {
                     // if we are not currently tracking a left thumbstick and this touch is on the left
                     // half of the screen, start tracking this touch as our left stick
-                    if (earliestTouch.Position.X < TouchPanel.DisplayWidth / 2)
+                    if (earliestTouch.Position.X < TouchPanel.DisplayWidth/2)
                     {
                         leftTouch = earliestTouch;
                         continue;
@@ -151,7 +146,7 @@ namespace HoneycombRush.Logic
                 {
                     // if we are not currently tracking a right thumbstick and this touch is on the right
                     // half of the screen, start tracking this touch as our right stick
-                    if (earliestTouch.Position.X >= TouchPanel.DisplayWidth / 2)
+                    if (earliestTouch.Position.X >= TouchPanel.DisplayWidth/2)
                     {
                         rightTouch = earliestTouch;
                         continue;

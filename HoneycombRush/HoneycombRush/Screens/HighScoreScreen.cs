@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
-
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -15,28 +13,26 @@ namespace HoneycombRush.Screens
     {
         #region Fields
 
+        private const int highscorePlaces = 5;
         private static readonly string HighScoreFilename = "highscores.txt";
 
-        private const int highscorePlaces = 5;
-
         private static List<KeyValuePair<string, int>> highScore = new List<KeyValuePair<string, int>>(highscorePlaces)
-        { 
-            new KeyValuePair<string, int>("Jasper", 55000), 
-            new KeyValuePair<string, int> ("Ellen", 52750), 
-            new KeyValuePair<string, int> ("Terry", 52200), 
-            new KeyValuePair<string, int> ("Lori", 50200), 
-            new KeyValuePair<string, int> ("Michael", 50750), 
-        };
+                                                                       {
+                                                                           new KeyValuePair<string, int>("Jasper", 55000),
+                                                                           new KeyValuePair<string, int>("Ellen", 52750),
+                                                                           new KeyValuePair<string, int>("Terry", 52200),
+                                                                           new KeyValuePair<string, int>("Lori", 50200),
+                                                                           new KeyValuePair<string, int>("Michael",
+                                                                                                         50750),
+                                                                       };
 
         private SpriteFont highScoreFont;
 
         public Dictionary<int, string> numberPlaceMapping;
 
-
         #endregion
 
         #region Initialzations
-
 
         /// <summary>
         /// Creates a new highscore screen instance.
@@ -59,11 +55,9 @@ namespace HoneycombRush.Screens
             base.LoadContent();
         }
 
-
         #endregion
 
         #region Handle Input
-
 
         /// <summary>
         /// Handles user input as a part of screen logic update.
@@ -105,11 +99,9 @@ namespace HoneycombRush.Screens
             ScreenManager.AddScreen(new MainMenuScreen(), null);
         }
 
-
         #endregion
 
         #region Render
-
 
         /// <summary>
         /// Renders the screen.
@@ -126,15 +118,15 @@ namespace HoneycombRush.Screens
                 {
                     // Draw place number
                     ScreenManager.SpriteBatch.DrawString(highScoreFont, GetPlaceString(i),
-                        new Vector2(20, i * 72 + 86), Color.Black);
+                                                         new Vector2(20, i*72 + 86), Color.Black);
 
                     // Draw Name
                     ScreenManager.SpriteBatch.DrawString(highScoreFont, highScore[i].Key,
-                        new Vector2(210, i * 72 + 86), Color.DarkRed);
+                                                         new Vector2(210, i*72 + 86), Color.DarkRed);
 
                     // Draw score
                     ScreenManager.SpriteBatch.DrawString(highScoreFont, highScore[i].Value.ToString(),
-                        new Vector2(560, i * 72 + 86), Color.Yellow);
+                                                         new Vector2(560, i*72 + 86), Color.Yellow);
                 }
             }
 
@@ -143,11 +135,9 @@ namespace HoneycombRush.Screens
             base.Draw(gameTime);
         }
 
-
         #endregion
 
         #region Highscore loading/saving logic
-
 
         /// <summary>
         /// Check if a score belongs on the high score table.
@@ -190,7 +180,7 @@ namespace HoneycombRush.Screens
         /// <returns>1 if the first highscore is smaller than the second, 0 if both
         /// are equal and -1 otherwise.</returns>
         private static int CompareScores(KeyValuePair<string, int> score1,
-            KeyValuePair<string, int> score2)
+                                         KeyValuePair<string, int> score2)
         {
             if (score1.Value < score2.Value)
             {
@@ -275,7 +265,6 @@ namespace HoneycombRush.Screens
             numberPlaceMapping.Add(3, "4TH");
             numberPlaceMapping.Add(4, "5TH");
         }
-
 
         #endregion
     }

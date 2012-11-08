@@ -1,7 +1,5 @@
 using System;
-
 using HoneycombRush.Screens;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,28 +10,6 @@ namespace HoneycombRush.Objects
     /// </summary>
     public abstract class BombBase : TexturedDrawableGameComponent
     {
-        protected string AnimationKey { get; set; }
-
-        protected abstract int MaxVelocity { get; }
-        protected abstract float AccelerationFactor { get; }
-        
-        public override Rectangle BodyRectangle
-        {
-            get
-            {
-                if (Texture == null)
-                {
-                    return default(Rectangle);
-                }
-                else
-                {
-                    // The bee's texture is an animation strip, so we must devide the texture's width by three 
-                    // to get the bee's actual width
-                    return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width / 3, Texture.Height);
-                }
-            }
-        }
-
         /// <summary>
         /// Creates a new bee instance.
         /// </summary>
@@ -47,6 +23,28 @@ namespace HoneycombRush.Objects
             : base(game, gamePlayScreen)
         {
             DrawOrder = Int32.MaxValue - 20;
+        }
+
+        protected string AnimationKey { get; set; }
+
+        protected abstract int MaxVelocity { get; }
+        protected abstract float AccelerationFactor { get; }
+
+        public override Rectangle BodyRectangle
+        {
+            get
+            {
+                if (Texture == null)
+                {
+                    return default(Rectangle);
+                }
+                else
+                {
+                    // The bee's texture is an animation strip, so we must devide the texture's width by three 
+                    // to get the bee's actual width
+                    return new Rectangle((int) Position.X, (int) Position.Y, Texture.Width/3, Texture.Height);
+                }
+            }
         }
 
         /// <summary>

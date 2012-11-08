@@ -1,9 +1,7 @@
 using System;
 using System.Threading;
-
 using HoneycombRush.Logic;
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -15,8 +13,8 @@ namespace HoneycombRush.Screens
         #region Fields
 
         private SpriteFont font;
-        private bool isLoading;
         private GameplayScreen gameplayScreen;
+        private bool isLoading;
         private Thread thread;
 
         #endregion
@@ -44,11 +42,9 @@ namespace HoneycombRush.Screens
             gameplayScreen.ScreenManager = ScreenManager;
         }
 
-
         #endregion
 
         #region Update
-
 
         /// <summary>
         /// Exit the screen after a tap gesture
@@ -102,11 +98,9 @@ namespace HoneycombRush.Screens
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }
 
-
         #endregion
 
         #region Render
-
 
         /// <summary>
         /// Render screen 
@@ -126,30 +120,27 @@ namespace HoneycombRush.Screens
                 string text = "Loading...";
                 Vector2 size = font.MeasureString(text);
                 Vector2 position = new Vector2(
-                    (ScreenManager.GraphicsDevice.Viewport.Width - size.X) / 2,
-                    (ScreenManager.GraphicsDevice.Viewport.Height - size.Y) / 2);
+                    (ScreenManager.GraphicsDevice.Viewport.Width - size.X)/2,
+                    (ScreenManager.GraphicsDevice.Viewport.Height - size.Y)/2);
                 spriteBatch.DrawString(font, text, position, Color.White);
             }
 
             spriteBatch.End();
         }
 
-
         #endregion
 
         #region Private functionality
-
 
         private void LoadResources()
         {
             // Start loading the resources in an additional thread
             thread = new Thread(
-                new ThreadStart(gameplayScreen.LoadAssets));
+                gameplayScreen.LoadAssets);
 
             thread.Start();
             isLoading = true;
         }
-
 
         #endregion
     }

@@ -1,7 +1,5 @@
 using System;
-
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -20,7 +18,7 @@ namespace HoneycombRush.Screens
         {
             TransitionOnTime = TimeSpan.FromSeconds(0.0);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
-            
+
             this.backgroundName = backgroundName;
         }
 
@@ -40,7 +38,6 @@ namespace HoneycombRush.Screens
         /// <param name="coveredByOtherScreen">Whether or not this screen is covered by another.</param>
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
-
             base.Update(gameTime, otherScreenHasFocus, false);
         }
 
@@ -55,7 +52,7 @@ namespace HoneycombRush.Screens
             spriteBatch.Begin();
 
             // Draw background
-            spriteBatch.Draw(background, new Vector2(0, 0), Color.White * TransitionAlpha);            
+            spriteBatch.Draw(background, new Vector2(0, 0), Color.White*TransitionAlpha);
 
             spriteBatch.End();
         }

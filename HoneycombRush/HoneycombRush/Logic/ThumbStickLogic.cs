@@ -1,30 +1,26 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using HoneycombRush.Objects;
 using HoneycombRush.ScreenManagerLogic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
 namespace HoneycombRush.Logic
 {
-    class ThumbStickLogic
+    internal class ThumbStickLogic
     {
-        private bool isSmokeButtonClicked;
-        private ScreenManager screenManager;
-        
-        private Vector2 smokeButtonPosition = new Vector2(664, 346);
-        private Vector2 controlstickStartupPosition;
-        private Vector2 controlstickBoundaryPosition;
-        
-        private Texture2D controlstickBoundary;
+        private Block[,] blocks;
         private Texture2D controlstick;
-        private Texture2D smokeButton;
+        private Texture2D controlstickBoundary;
+        private Vector2 controlstickBoundaryPosition;
+        private Vector2 controlstickStartupPosition;
+        private bool isSmokeButtonClicked;
+        private Vector2 lastTouchPosition;
+        private ScreenManager screenManager;
 
-        Block[,] blocks;
-        Vector2 lastTouchPosition;
+        private Texture2D smokeButton;
+        private Vector2 smokeButtonPosition = new Vector2(664, 346);
 
         public ThumbStickLogic(ScreenManager screenManager)
         {
@@ -32,10 +28,11 @@ namespace HoneycombRush.Logic
             controlstickBoundaryPosition = new Vector2(34, 347);
             controlstickStartupPosition = new Vector2(55, 369);
         }
-        
+
         public Rectangle GetThumbStickArea()
         {
-            return new Rectangle((int)controlstickBoundaryPosition.X, (int)controlstickBoundaryPosition.Y, controlstickBoundary.Width, controlstickBoundary.Height);
+            return new Rectangle((int) controlstickBoundaryPosition.X, (int) controlstickBoundaryPosition.Y,
+                                 controlstickBoundary.Width, controlstickBoundary.Height);
         }
 
         /// <summary>
@@ -46,20 +43,20 @@ namespace HoneycombRush.Logic
             if (isSmokeButtonClicked)
             {
                 screenManager.SpriteBatch.Draw(
-                   smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-                   new Rectangle(109, 0, 109, 109), Color.White);
+                    smokeButton, new Rectangle((int) smokeButtonPosition.X, (int) smokeButtonPosition.Y, 109, 109),
+                    new Rectangle(109, 0, 109, 109), Color.White);
             }
             else
             {
                 screenManager.SpriteBatch.Draw(
-                smokeButton, new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 109, 109),
-                new Rectangle(0, 0, 109, 109), Color.White);
+                    smokeButton, new Rectangle((int) smokeButtonPosition.X, (int) smokeButtonPosition.Y, 109, 109),
+                    new Rectangle(0, 0, 109, 109), Color.White);
             }
-            
+
             screenManager.SpriteBatch.Draw(controlstickBoundary, controlstickBoundaryPosition, Color.White);
             screenManager.SpriteBatch.Draw(controlstick, controlstickStartupPosition, Color.White);
         }
-        
+
         internal void LoadTextures(ScreenManager ScreenManager)
         {
             controlstickBoundary = screenManager.Game.Content.Load<Texture2D>("Textures/controlstickBoundary");
@@ -79,7 +76,7 @@ namespace HoneycombRush.Logic
             if (bombsToBeDeleted.Count() > 0)
             {
                 foreach (Bomb bomb in bombsToBeDeleted)
-                {                    
+                {
                     screenManager.Game.Components.Remove(bomb);
                     bomb.Stop();
                 }
@@ -89,10 +86,12 @@ namespace HoneycombRush.Logic
             if (VirtualThumbsticks.RightThumbstickCenter.HasValue)
             {
                 // Button BodyRectangle
-                Rectangle buttonRectangle = new Rectangle((int)smokeButtonPosition.X, (int)smokeButtonPosition.Y, 60, 109);
+                Rectangle buttonRectangle = new Rectangle((int) smokeButtonPosition.X, (int) smokeButtonPosition.Y, 60,
+                                                          109);
 
                 // Touch BodyRectangle
-                Rectangle touchRectangle = new Rectangle((int)VirtualThumbsticks.RightThumbstickCenter.Value.X, (int)VirtualThumbsticks.RightThumbstickCenter.Value.Y, 1, 1);
+                Rectangle touchRectangle = new Rectangle((int) VirtualThumbsticks.RightThumbstickCenter.Value.X,
+                                                         (int) VirtualThumbsticks.RightThumbstickCenter.Value.Y, 1, 1);
 
                 // If the touch is in the button
                 if (buttonRectangle.Contains(touchRectangle))
@@ -112,7 +111,7 @@ namespace HoneycombRush.Logic
             // Calculate the rectangle of the outer circle of the thumbstick
             Rectangle outerControlstick = new Rectangle(
                 0,
-                (int)controlstickBoundaryPosition.Y - 35,
+                (int) controlstickBoundaryPosition.Y - 35,
                 controlstickBoundary.Width + 60,
                 controlstickBoundary.Height + 60);
 
@@ -131,7 +130,7 @@ namespace HoneycombRush.Logic
             else
             {
                 // If not in motion and the touch point is not in the control bounds - there is no movement
-                Rectangle touchRectangle = new Rectangle((int)lastTouchPosition.X, (int)lastTouchPosition.Y, 1, 1);
+                Rectangle touchRectangle = new Rectangle((int) lastTouchPosition.X, (int) lastTouchPosition.Y, 1, 1);
 
                 if (!outerControlstick.Contains(touchRectangle))
                 {
@@ -143,8 +142,8 @@ namespace HoneycombRush.Logic
                 setMotion(bomberman);
 
                 // Moves the thumbstick's inner circle
-                float radious = controlstick.Width / 2 + 35;
-                controlstickStartupPosition = new Vector2(55, 369) + (VirtualThumbsticks.LeftThumbstick * radious);
+                float radious = controlstick.Width/2 + 35;
+                controlstickStartupPosition = new Vector2(55, 369) + (VirtualThumbsticks.LeftThumbstick*radious);
             }
         }
 
@@ -174,29 +173,35 @@ namespace HoneycombRush.Logic
         {
             Vector2 leftThumbstick = VirtualThumbsticks.LeftThumbstick;
 
-            Vector2 bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12f;
+            Vector2 bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) +
+                                               leftThumbstick*12f;
 
-            if (bomberCalculatedPosition.X < 20 || bomberCalculatedPosition.X + bomberman.CollisionArea.Width > screenManager.GraphicsDevice.Viewport.Width)
+            if (bomberCalculatedPosition.X < 20 ||
+                bomberCalculatedPosition.X + bomberman.CollisionArea.Width > screenManager.GraphicsDevice.Viewport.Width)
             {
                 leftThumbstick.X = 0;
             }
-            if (bomberCalculatedPosition.Y < 20 || bomberCalculatedPosition.Y + bomberman.CollisionArea.Height > screenManager.GraphicsDevice.Viewport.Height)
+            if (bomberCalculatedPosition.Y < 20 ||
+                bomberCalculatedPosition.Y + bomberman.CollisionArea.Height >
+                screenManager.GraphicsDevice.Viewport.Height)
             {
                 leftThumbstick.Y = 0;
             }
 
             if (leftThumbstick != Vector2.Zero)
             {
-                if (bomberman.GetDirection == Bomberman.WalkingDirection.Down || bomberman.GetDirection == Bomberman.WalkingDirection.Up)
+                if (bomberman.GetDirection == Bomberman.WalkingDirection.Down ||
+                    bomberman.GetDirection == Bomberman.WalkingDirection.Up)
                 {
                     if (checkBlockCollision(bomberCalculatedPosition, bomberman))
                     {
                         leftThumbstick.Y = 0;
-                        bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
+                        bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) +
+                                                   leftThumbstick*12;
 
                         if (!checkBlockCollision(bomberCalculatedPosition, bomberman))
                         {
-                            bomberman.SetMovement(leftThumbstick * 12f);
+                            bomberman.SetMovement(leftThumbstick*12f);
                         }
                     }
                 }
@@ -205,20 +210,22 @@ namespace HoneycombRush.Logic
                     if (checkBlockCollision(bomberCalculatedPosition, bomberman))
                     {
                         leftThumbstick.X = 0;
-                        bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
+                        bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) +
+                                                   leftThumbstick*12;
 
                         if (!checkBlockCollision(bomberCalculatedPosition, bomberman))
                         {
-                            bomberman.SetMovement(leftThumbstick * 12f);
+                            bomberman.SetMovement(leftThumbstick*12f);
                         }
                     }
                 }
 
-                bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) + leftThumbstick * 12;
+                bomberCalculatedPosition = new Vector2(bomberman.CollisionArea.X, bomberman.CollisionArea.Y) +
+                                           leftThumbstick*12;
 
                 if (!checkBlockCollision(bomberCalculatedPosition, bomberman))
                 {
-                    bomberman.SetMovement(leftThumbstick * 12f);
+                    bomberman.SetMovement(leftThumbstick*12f);
                 }
             }
         }
@@ -233,8 +240,8 @@ namespace HoneycombRush.Logic
             // We do not use the beekeeper's collision area property as he has not actually moved at this point and
             // is still in his previous position
             Rectangle bomberTempCollisionArea = new Rectangle(
-                (int)bomberCalculatedPosition.X,
-                (int)bomberCalculatedPosition.Y,
+                (int) bomberCalculatedPosition.X,
+                (int) bomberCalculatedPosition.Y,
                 bomberman.CollisionArea.Width,
                 bomberman.CollisionArea.Height);
 

@@ -1,16 +1,18 @@
 #region File Description
+
 //-----------------------------------------------------------------------------
 // InputState.cs
 //
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
+
 #endregion
+
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-
-using System.Collections.Generic;
 
 namespace HoneycombRush.ScreenManagerLogic
 {
@@ -26,22 +28,19 @@ namespace HoneycombRush.ScreenManagerLogic
 
         public const int MaxInputs = 4;
 
-        public readonly KeyboardState[] CurrentKeyboardStates;
         public readonly GamePadState[] CurrentGamePadStates;
-
-        public readonly KeyboardState[] LastKeyboardStates;
-        public readonly GamePadState[] LastGamePadStates;
+        public readonly KeyboardState[] CurrentKeyboardStates;
 
         public readonly bool[] GamePadWasConnected;
 
-        public TouchCollection TouchState;
-
         public readonly List<GestureSample> Gestures = new List<GestureSample>();
+        public readonly GamePadState[] LastGamePadStates;
+        public readonly KeyboardState[] LastKeyboardStates;
+        public TouchCollection TouchState;
 
         #endregion
 
         #region Initialization
-
 
         /// <summary>
         /// Constructs a new input state.
@@ -57,11 +56,9 @@ namespace HoneycombRush.ScreenManagerLogic
             GamePadWasConnected = new bool[MaxInputs];
         }
 
-
         #endregion
 
         #region Public Methods
-
 
         /// <summary>
         /// Reads the latest state of the keyboard and gamepad.
@@ -73,8 +70,8 @@ namespace HoneycombRush.ScreenManagerLogic
                 LastKeyboardStates[i] = CurrentKeyboardStates[i];
                 LastGamePadStates[i] = CurrentGamePadStates[i];
 
-                CurrentKeyboardStates[i] = Keyboard.GetState((PlayerIndex)i);
-                CurrentGamePadStates[i] = GamePad.GetState((PlayerIndex)i);
+                CurrentKeyboardStates[i] = Keyboard.GetState((PlayerIndex) i);
+                CurrentGamePadStates[i] = GamePad.GetState((PlayerIndex) i);
 
                 // Keep track of whether a gamepad has ever been
                 // connected, so we can detect if it is unplugged.
@@ -101,14 +98,14 @@ namespace HoneycombRush.ScreenManagerLogic
         /// is detected, the output playerIndex reports which player pressed it.
         /// </summary>
         public bool IsNewKeyPress(Keys key, PlayerIndex? controllingPlayer,
-                                            out PlayerIndex playerIndex)
+                                  out PlayerIndex playerIndex)
         {
             if (controllingPlayer.HasValue)
             {
                 // Read input from the specified player.
                 playerIndex = controllingPlayer.Value;
 
-                int i = (int)playerIndex;
+                int i = (int) playerIndex;
 
                 return (CurrentKeyboardStates[i].IsKeyDown(key) &&
                         LastKeyboardStates[i].IsKeyUp(key));
@@ -130,14 +127,14 @@ namespace HoneycombRush.ScreenManagerLogic
         /// is detected, the output playerIndex reports which player pressed it.
         /// </summary>
         public bool IsKeyDown(Keys key, PlayerIndex? controllingPlayer,
-                                            out PlayerIndex playerIndex)
+                              out PlayerIndex playerIndex)
         {
             if (controllingPlayer.HasValue)
             {
                 // Read input from the specified player.
                 playerIndex = controllingPlayer.Value;
 
-                int i = (int)playerIndex;
+                int i = (int) playerIndex;
 
                 return (CurrentKeyboardStates[i].IsKeyDown(key));
             }
@@ -158,14 +155,14 @@ namespace HoneycombRush.ScreenManagerLogic
         /// is detected, the output playerIndex reports which player pressed it.
         /// </summary>
         public bool IsNewButtonPress(Buttons button, PlayerIndex? controllingPlayer,
-                                                     out PlayerIndex playerIndex)
+                                     out PlayerIndex playerIndex)
         {
             if (controllingPlayer.HasValue)
             {
                 // Read input from the specified player.
                 playerIndex = controllingPlayer.Value;
 
-                int i = (int)playerIndex;
+                int i = (int) playerIndex;
 
                 return (CurrentGamePadStates[i].IsButtonDown(button) &&
                         LastGamePadStates[i].IsButtonUp(button));
@@ -255,7 +252,6 @@ namespace HoneycombRush.ScreenManagerLogic
                    IsNewButtonPress(Buttons.Back, controllingPlayer, out playerIndex) ||
                    IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
         }
-
 
         #endregion
     }

@@ -1,8 +1,6 @@
 using System;
-
 using HoneycombRush.Logic;
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 
 namespace HoneycombRush.Screens
@@ -10,7 +8,6 @@ namespace HoneycombRush.Screens
     internal class PauseScreen : MenuScreen
     {
         #region Initializations
-
 
         public PauseScreen()
             : base(string.Empty)
@@ -32,19 +29,17 @@ namespace HoneycombRush.Screens
             MenuEntries.Add(returnGameMenuEntry);
             MenuEntries.Add(exitMenuEntry);
         }
-        
 
         #endregion
 
         #region Update
-
 
         /// <summary>
         /// Respond to "Return" Item Selection
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ReturnGameMenuEntrySelected(object sender, EventArgs e)
+        private void ReturnGameMenuEntrySelected(object sender, EventArgs e)
         {
             AudioManager.PauseResumeSounds(true);
 
@@ -66,14 +61,10 @@ namespace HoneycombRush.Screens
             foreach (GameScreen screen in  ScreenManager.GetScreens())
                 screen.ExitScreen();
 
-             ScreenManager.AddScreen(new BackgroundScreen("titleScreen"), null);
-             ScreenManager.AddScreen(new MainMenuScreen(), null);
+            ScreenManager.AddScreen(new BackgroundScreen("titleScreen"), null);
+            ScreenManager.AddScreen(new MainMenuScreen(), null);
         }
-
 
         #endregion
     }
 }
-
-
-

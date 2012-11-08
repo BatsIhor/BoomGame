@@ -1,7 +1,4 @@
 using System;
-
-using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,16 +10,14 @@ namespace HoneycombRush.Logic
     public class Animation
     {
         private Texture2D animatedCharacter;
-        private Point sheetSize;
         private Point currentFrame;
+        private bool drawWasAlreadyCalledOnce;
         private Point frameSize;
-
-        private TimeSpan lastestChangeTime;
-        private TimeSpan timeInterval = TimeSpan.Zero;
-
         private int lastSubFrame = -1;
 
-        private bool drawWasAlreadyCalledOnce = false;
+        private TimeSpan lastestChangeTime;
+        private Point sheetSize;
+        private TimeSpan timeInterval = TimeSpan.Zero;
 
         /// <summary>
         /// Creates a new instance of the animation class
@@ -41,29 +36,23 @@ namespace HoneycombRush.Logic
 
         public int FrameCount
         {
-            get
-            {
-                return sheetSize.X * sheetSize.Y;
-            }
+            get { return sheetSize.X*sheetSize.Y; }
         }
 
         public Vector2 Offset { get; set; }
 
         public int FrameIndex
         {
-            get
-            {
-                return sheetSize.X * currentFrame.Y + currentFrame.X;
-            }
+            get { return sheetSize.X*currentFrame.Y + currentFrame.X; }
             set
             {
-                if (value >= sheetSize.X * sheetSize.Y + 1)
+                if (value >= sheetSize.X*sheetSize.Y + 1)
                 {
                     throw new InvalidOperationException("Specified frame index exceeds available frames");
                 }
 
-                currentFrame.Y = value / sheetSize.X;
-                currentFrame.X = value % sheetSize.X;
+                currentFrame.Y = value/sheetSize.X;
+                currentFrame.X = value%sheetSize.X;
             }
         }
 
@@ -155,14 +144,15 @@ namespace HoneycombRush.Logic
         /// The collision Area.
         /// </param>
         /// Offset of the frame.
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffect, Vector2 origin, Texture2D collisionArea)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffect, Vector2 origin,
+                         Texture2D collisionArea)
         {
             drawWasAlreadyCalledOnce = true;
 
             spriteBatch.Draw(
                 animatedCharacter,
                 position + Offset,
-                new Rectangle(frameSize.X * currentFrame.X, frameSize.Y * currentFrame.Y, frameSize.X, frameSize.Y),
+                new Rectangle(frameSize.X*currentFrame.X, frameSize.Y*currentFrame.Y, frameSize.X, frameSize.Y),
                 Color.White,
                 0f,
                 origin,
@@ -204,7 +194,7 @@ namespace HoneycombRush.Logic
             spriteBatch.Draw(
                 animatedCharacter,
                 position + Offset,
-                new Rectangle(frameSize.X * currentFrame.X, frameSize.Y * currentFrame.Y, frameSize.X, frameSize.Y),
+                new Rectangle(frameSize.X*currentFrame.X, frameSize.Y*currentFrame.Y, frameSize.X, frameSize.Y),
                 Color.White,
                 0f,
                 Vector2.Zero,

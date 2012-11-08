@@ -1,36 +1,32 @@
 using System;
-
+using System.Threading;
 using HoneycombRush.Logic;
 using HoneycombRush.ScreenManagerLogic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-
-using System.Threading;
 
 namespace HoneycombRush.Screens
 {
     internal class LevelOverScreen : GameScreen
     {
         #region Fields
-        
-        private SpriteFont font36px;
-        private SpriteFont font16px;
-
-        private string text;
-        private bool isLoading;
-        private Vector2 textSize;
 
         private DifficultyMode? difficultyMode;
+        private SpriteFont font16px;
+        private SpriteFont font36px;
+        private GameplayScreen gameplayScreen;
+
+        private bool isLoading;
+        private string text;
+        private Vector2 textSize;
 
         private Thread thread;
-        private GameplayScreen gameplayScreen;
-        
+
         #endregion
 
         #region Initialization
-        
+
         /// <summary>
         /// Ctor.
         /// </summary>
@@ -58,11 +54,9 @@ namespace HoneycombRush.Screens
             textSize = font36px.MeasureString(text);
         }
 
-
         #endregion
 
         #region Update
-
 
         /// <summary>
         /// Update the screen
@@ -115,11 +109,9 @@ namespace HoneycombRush.Screens
             base.HandleInput(gameTime, input);
         }
 
-
         #endregion
 
         #region Render
-
 
         /// <summary>
         /// Renders the screen
@@ -137,28 +129,29 @@ namespace HoneycombRush.Screens
             {
                 string tapText = "Touch to start next level";
                 spriteBatch.DrawString(font16px, tapText,
-                new Vector2( ScreenManager.GraphicsDevice.Viewport.Width / 2 - font16px.MeasureString(tapText).X / 2,
-                                    ScreenManager.GraphicsDevice.Viewport.Height -
-                                   font16px.MeasureString(tapText).Y - 4), Color.Black);
+                                       new Vector2(
+                                           ScreenManager.GraphicsDevice.Viewport.Width/2 -
+                                           font16px.MeasureString(tapText).X/2,
+                                           ScreenManager.GraphicsDevice.Viewport.Height -
+                                           font16px.MeasureString(tapText).Y - 4), Color.Black);
             }
             else
             {
-
                 string tapText = "Touch to end game";
                 spriteBatch.DrawString(font16px, tapText,
-                new Vector2( ScreenManager.GraphicsDevice.Viewport.Width / 2 - font16px.MeasureString(tapText).X / 2,
-                                    ScreenManager.GraphicsDevice.Viewport.Height -
-                                   font16px.MeasureString(tapText).Y - 4), Color.Black);
+                                       new Vector2(
+                                           ScreenManager.GraphicsDevice.Viewport.Width/2 -
+                                           font16px.MeasureString(tapText).X/2,
+                                           ScreenManager.GraphicsDevice.Viewport.Height -
+                                           font16px.MeasureString(tapText).Y - 4), Color.Black);
             }
 
             spriteBatch.End();
         }
 
-
         #endregion
 
         #region Private Function
-
 
         /// <summary>
         /// Starts new level or exit to High Score
@@ -169,20 +162,19 @@ namespace HoneycombRush.Screens
             // If there is no next level - go to high score screen
             if (!difficultyMode.HasValue)
             {
-                 ScreenManager.AddScreen(new BackgroundScreen("highScoreScreen"), null);
-                 ScreenManager.AddScreen(new HighScoreScreen(), null);
+                ScreenManager.AddScreen(new BackgroundScreen("highScoreScreen"), null);
+                ScreenManager.AddScreen(new HighScoreScreen(), null);
             }
-            // If not already loading
+                // If not already loading
             else if (!isLoading)
             {
                 // Start loading the resources in an additional thread
-                thread = new Thread(new ThreadStart(gameplayScreen.LoadAssets));
+                thread = new Thread(gameplayScreen.LoadAssets);
 
                 isLoading = true;
                 thread.Start();
             }
         }
-
 
         #endregion
     }
