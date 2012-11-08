@@ -1,14 +1,14 @@
+
+
+using HoneycombRush.Objects;
+using HoneycombRush.ScreenManagerLogic;
+using HoneycombRush.Screens;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using HoneycombRush.ScreenManagerLogic;
-using Microsoft.Xna.Framework;
-using HoneycombRush.Objects;
 using System.Diagnostics;
-using HoneycombRush.Screens;
+using System.Xml.Linq;
 
 namespace HoneycombRush.Logic
 {
